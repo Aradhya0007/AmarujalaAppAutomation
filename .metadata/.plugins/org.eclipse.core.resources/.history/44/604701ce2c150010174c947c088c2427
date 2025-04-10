@@ -1,0 +1,75 @@
+package Signup;
+
+import java.time.Duration;
+
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+
+import Logout.logout;
+import basetest.Abstract;
+import io.appium.java_client.android.AndroidDriver;
+
+public class TypesOfSignup extends Abstract {
+	
+	AndroidDriver driver;
+	//Locator 
+	//Account banana chahte ho
+		@FindBy(xpath = "//android.widget.TextView[@text=\"अकाउंट बनाना चाहते हैं? साइन अप करें\"]")
+		WebElement SignupKareSignup;
+		
+	//Login with Password button
+		@FindBy(xpath = "//android.widget.TextView[@text=\"पासवर्ड के जरिए लॉगइन करें\"]")
+		WebElement LoginWithPasswordSignup;
+		
+		
+
+		
+	
+	public TypesOfSignup(AndroidDriver driver) {
+		super(driver);
+		this.driver=driver;
+		PageFactory.initElements(driver, this);  
+	}
+
+	public void  NavigationToSignupByLoginbtn() throws InterruptedException {
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+		menu();
+		menuLoginbtn();
+		SignupKareSignup.click();
+		signupflowmakenewaccount loginbtnflowsignup=new signupflowmakenewaccount(driver);
+		loginbtnflowsignup.validateMobileNumberField();
+		//logout
+		logout Logout=new logout(driver);
+		Logout.logoutflow();
+		
+	}
+	
+	public void NavigationToSignupByPremiumBtn() throws InterruptedException {
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+		menu();
+		//menuLoginbtn();
+		premiumbtn();
+		SignupKareSignup.click();
+		signupflowmakenewaccount premiumbtnflowsignup=new signupflowmakenewaccount(driver);
+		 premiumbtnflowsignup.validateMobileNumberField();
+		 //logout
+     	 logout Logout=new logout(driver);
+	     Logout.logoutflow();
+		
+	}
+	
+	public void ForgotPassSignup() throws InterruptedException {
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+		menu();
+		menuLoginbtn();
+		LoginWithPasswordSignup.click();
+		ForgotPasswordSignup forgotPasssFlow=new ForgotPasswordSignup(driver);
+		String number= rumbergenrater();
+		forgotPasssFlow.ForgotPassflow(number);
+		
+		
+		
+	}
+
+}

@@ -1,0 +1,30 @@
+package user;
+
+import java.time.Duration;
+
+import org.testng.annotations.Test;
+
+import Signup.TypesOfSignup;
+import basetest.Basecode;
+import login.TypesOfLogin;
+
+
+public class AutomationAos extends Basecode {
+	  @Test
+	    public void signup() throws InterruptedException {
+		  TypesOfSignup Signup=new TypesOfSignup(driver);
+		  Signup.NumberSignup();
+		  Signup.ForgotPassSignup();
+		 }
+	  
+	  
+	  @Test
+	  public void login() throws InterruptedException {
+		  TypesOfLogin Login=new TypesOfLogin(driver);
+		  Login.PasswordLogin();
+		  Login.NumberLogin();
+		  Login.PopupLogin();
+	  }
+    
+} 
+ 

@@ -1,0 +1,128 @@
+package login;
+
+import java.time.Duration;
+
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+import org.testng.Assert;
+
+import basetest.Abstract;
+import io.appium.java_client.android.AndroidDriver;
+
+public class Emailpasslogin extends Abstract {
+	AndroidDriver driver;
+	public Emailpasslogin(AndroidDriver driver) {
+		super(driver);
+		// TODO Auto-generated constructor stub
+		this.driver=driver;
+		PageFactory.initElements(driver, this);
+	}
+	//Locator......
+	
+	//enter email and number conatiner 
+		@FindBy(xpath="(//android.widget.EditText)[1]")
+		WebElement EmailLogin;
+		
+		//enter password
+		@FindBy(xpath="(//android.widget.EditText)[2]")
+		WebElement PasswordLogin;
+
+        //validation msg when invalid/blank email/num
+		@FindBy(xpath="//android.widget.TextView[@text=\"कृपया एक वैध ईमेल/फोन नंबर दर्ज करें\"]")
+		WebElement InvalidEmailValidationMsgLogin;
+		
+		//validation msg when invalid/blank Password
+		@FindBy(xpath="//android.widget.TextView[@text=\"कृपया पासवर्ड दर्ज करें\"]")
+		WebElement InvalidPasswordValidationMsfLogin;
+		
+		//watch the pass
+		@FindBy(xpath="//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView/com.horcrux.svg.GroupView/com.horcrux.svg.PathView[2]")
+		WebElement WatchPassLogin;
+		
+		//login kare
+		@FindBy(xpath="//android.view.ViewGroup[@content-desc=\"लॉगइन करें\"]")
+		WebElement SubmitLoginLogin;
+		
+		//when incorrect email or pass is filled msg popup
+		@FindBy(xpath="//android.widget.TextView[@text=\"Please enter a valid email & password. Or click on Forgot Password to reset the password.\"]")
+		WebElement IncorrectPopupMsgLogin;
+		
+		//ok btn
+		@FindBy(xpath="//android.widget.TextView[@text=\"OK\"]")
+		WebElement OKbtnOfPopupLogin;
+		
+		//Blocked validation msg 
+		@FindBy(xpath="//android.widget.TextView[@text=\"Account blocked, Please try after few minutes\"]")
+		WebElement BlockedValidationMsgLogin;
+		
+		
+		
+		public void  loginwithpasswordflow() throws InterruptedException {
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+			//blank filled submit
+			Thread.sleep(2000);
+			SubmitLoginLogin.click();
+			Assert.assertTrue(InvalidEmailValidationMsgLogin.isDisplayed(), "validation msg is not getting");
+			Assert.assertTrue(InvalidPasswordValidationMsfLogin.isDisplayed(), "validation msg is not getting");
+			//invalid email Valid pass
+			EmailLogin.sendKeys("testsjj.com");
+			PasswordLogin.sendKeys("Test22@");
+			WatchPassLogin.click();
+			SubmitLoginLogin.click();
+			Assert.assertTrue(InvalidEmailValidationMsgLogin.isDisplayed(), "validation msg is not getting");
+			EmailLogin.clear();
+			PasswordLogin.clear();
+			//invalid pass valid email
+			EmailLogin.sendKeys("testing12@gmail.com");
+			PasswordLogin.sendKeys("Test");
+			SubmitLoginLogin.click();
+			Assert.assertTrue(InvalidPasswordValidationMsfLogin.isDisplayed(), "validation msg is not getting");
+			EmailLogin.clear();
+			PasswordLogin.clear();
+			//wrong email and pass
+			EmailLogin.sendKeys("testing12@gmail.com");
+			PasswordLogin.sendKeys("Test221@");
+			SubmitLoginLogin.click();
+			Assert.assertTrue(IncorrectPopupMsgLogin.isDisplayed(), "validation popup msg is not getting");
+			OKbtnOfPopupLogin.click();
+			EmailLogin.clear();
+			PasswordLogin.clear();
+			//Wrong email and correct pass
+			EmailLogin.sendKeys("Sudhanshu.sharmsa@auw.co.in");
+			PasswordLogin.sendKeys("Test@123");
+			SubmitLoginLogin.click();
+			Assert.assertTrue(IncorrectPopupMsgLogin.isDisplayed(), "validation popup msg is not getting");
+			OKbtnOfPopupLogin.click();
+			EmailLogin.clear();
+			PasswordLogin.clear();
+			//correct email wrong pass
+			EmailLogin.sendKeys("Sudhanshu.sharma@auw.co.in");
+			PasswordLogin.sendKeys("Test@12");
+			SubmitLoginLogin.click();
+			Assert.assertTrue(IncorrectPopupMsgLogin.isDisplayed(), "validation popup msg is not getting");
+			OKbtnOfPopupLogin.click();
+			EmailLogin.clear();
+			PasswordLogin.clear();
+			//blocked case
+			SubmitLoginLogin.click();
+			Assert.assertTrue(IncorrectPopupMsgLogin.isDisplayed(), "validation popup msg is not getting");
+			OKbtnOfPopupLogin.click();
+			
+			
+			SubmitLoginLogin.click();
+			Assert.assertTrue(IncorrectPopupMsgLogin.isDisplayed(), "validation popup msg is not getting");
+			OKbtnOfPopupLogin.click();
+			
+			SubmitLoginLogin.click();
+			Assert.assertTrue(BlockedValidationMsgLogin.isDisplayed(), "validation Block msg is not getting");
+			OKbtnOfPopupLogin.click();
+			
+			
+			//correct flow 
+			EmailLogin.sendKeys("amresh.pandey@auw.co.in");
+			PasswordLogin.sendKeys("Amresh@123");
+			SubmitLoginLogin.click();
+		}
+
+}

@@ -1,0 +1,20 @@
+package user;
+
+import java.time.Duration;
+
+import org.testng.annotations.Test;
+
+import Signup.navigationToSignupPage;
+import basetest.Basecode;
+
+
+public class AutomationAos extends Basecode {
+	  @Test
+	    public void signup() throws InterruptedException {
+		  navigationToSignupPage loginbutton=new navigationToSignupPage(driver);
+		  loginbutton.NavigationToSignupByLoginbtn();
+		  loginbutton.NavigationToSignupByPremiumBtn(); 
+		 }
+    
+} 
+ 

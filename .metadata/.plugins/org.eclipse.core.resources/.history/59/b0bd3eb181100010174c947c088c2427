@@ -1,0 +1,112 @@
+package basetest;
+
+import java.time.Duration;
+import java.util.Random;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import io.appium.java_client.android.AndroidDriver;
+
+public class Abstract {
+	AndroidDriver driver;
+	JavascriptExecutor js ;
+	WebDriverWait wait;
+	public Abstract(AndroidDriver driver) {
+		this.driver=driver;
+		this.js=driver;
+		PageFactory.initElements(driver, this);
+	}
+	//footer Navigation.........................................................
+	
+	//menu
+	@FindBy(xpath="//android.widget.TextView[@text=\"मेन्यू\"]")
+	WebElement Menu;
+	
+	
+
+	public void menu() {
+		Menu.click();
+	}
+	
+	
+	
+	
+	//Signup/Login common thing.....................................................
+	@FindBy(xpath="//android.widget.TextView[@text=\"लॉगइन करें\"]")
+	WebElement MenuLoginbtn;
+	 
+	
+	public void menuLoginbtn() {
+		MenuLoginbtn.click();
+	}
+	
+	
+	
+	
+	//Rondom number genrater 
+	public String rumbergenrater() {
+		Random random = new Random();
+		int randomDigits = 1000000 + random.nextInt(9000000);
+		String randomNumber = "123" + randomDigits;
+		return randomNumber;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+//	clear otp
+	public void clearotp() {
+		for(int i=6;i<0;i++) {
+			driver.findElement(By.xpath("(//android.view.ViewGroup[@content-desc=\"-\"])[1]")).clear();
+		}
+	}
+	
+	
+
+	//javascript
+	public void scrollvertical(int valued) {
+		js.executeScript("window.scrollBy(0, arguments[0])", valued);
+	}
+	
+	//wait
+	public WebDriverWait waitingtime(int time) {
+		wait = new WebDriverWait(driver, Duration.ofSeconds(time));
+		return wait;
+	}
+	
+	//contextswitch
+	public void contexts() {
+		System.out.println(driver.getContextHandles());
+		driver.context("WEBVIEW_com.amarujala.myjyotish");
+	}
+
+}

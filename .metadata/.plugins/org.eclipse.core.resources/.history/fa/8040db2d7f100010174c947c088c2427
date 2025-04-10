@@ -1,0 +1,159 @@
+package Signup;
+
+import java.time.Duration;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
+import basetest.Abstract;
+import io.appium.java_client.android.AndroidDriver;
+
+public class Signupfromloginbtn extends Abstract {
+    AndroidDriver driver;
+    WebDriverWait wait;
+
+    public Signupfromloginbtn(AndroidDriver driver) {
+        super(driver);
+        this.driver = driver;
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(15));  // Explicit wait (15 sec)
+        PageFactory.initElements(driver, this);
+    }
+
+    // ✅ Enter number for signup page locator
+    @FindBy(xpath = "//android.widget.TextView[@text=\"अकाउंट बनाना चाहते हैं? साइन अप करें\"]")
+    private WebElement SignupKareSignup;
+
+    @FindBy(className = "android.widget.EditText")
+    private WebElement MobileNumberSignup;
+
+    @FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"ओटीपी जनरेट करें\"]")
+    private WebElement OTPgenrateSignup;
+
+    @FindBy(xpath = "//android.widget.Button[@resource-id=\"android:id/button1\"]")
+    private WebElement InvalidNumberErrorOKSignup;
+
+    // ✅ OTP page locators
+    @FindBy(xpath = "(//android.widget.TextView[@text='-'])[1]")
+    private WebElement EnterotpSignup;
+
+    @FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"ओटीपी सत्यापित करें\"]")
+    private WebElement SubmitOtpSignup;
+
+    @FindBy(xpath = "//android.widget.TextView[@text=\"मोबाइल नंबर बदलें\"]")
+    private WebElement ChangeNumberSignup;
+
+    @FindBy(xpath = "//android.widget.TextView[@text=\"Invalid OTP\"]")
+    private WebElement InvalidOtpMsgSignup;
+
+    @FindBy(xpath = "//android.widget.TextView[@text=\"OK\"]")
+    private WebElement InvalidOtpMsgOkBtnSignup;
+
+    @FindBy(xpath = "//android.widget.TextView[@text=\"Account blocked, Please try after few minutes\"]")
+    private WebElement BlockAccountMsgSignup;
+
+    @FindBy(xpath = "//android.widget.TextView[@text=\"OK\"]")
+    private WebElement BlockAccountMsgOKBTnSignup;
+
+    // ✅ Helper method for explicit wait
+    private void waitForElement(WebElement element) {
+        wait.until(ExpectedConditions.visibilityOf(element));
+    }
+
+    // ✅ Navigate to signup
+    public void NavigationSignup() throws InterruptedException {
+        menu();
+        menuLoginbtn();
+        waitForElement(SignupKareSignup);
+        SignupKareSignup.click();
+    }
+
+    // ✅ Mobile Number Validation
+    public void validateMobileNumberField() throws InterruptedException {
+        // 1️⃣ Blank input
+        waitForElement(OTPgenrateSignup);
+        OTPgenrateSignup.click();
+        waitForElement(InvalidNumberErrorOKSignup);
+        InvalidNumberErrorOKSignup.click();
+        Assert.assertTrue(driver.findElement(By.xpath("//android.widget.TextView[@text=\"Please enter 10 digit mobile number\"]")).isDisplayed(),
+                "Expected error message is not displayed.");
+
+        // 2️⃣ Number less than 10 digits
+        MobileNumberSignup.clear();
+        waitForElement(MobileNumberSignup);
+        MobileNumberSignup.sendKeys("12309898");
+        OTPgenrateSignup.click();
+        waitForElement(InvalidNumberErrorOKSignup);
+        InvalidNumberErrorOKSignup.click();
+        Assert.assertTrue(driver.findElement(By.xpath("//android.widget.TextView[@text=\"Please enter 10 digit mobile number\"]")).isDisplayed(),
+                "Expected error message is not displayed.");
+
+        // 3️⃣ Valid case
+        MobileNumberSignup.clear();
+        String number = rumbergenrater();
+        MobileNumberSignup.sendKeys(number);
+        OTPgenrateSignup.click();
+    }
+
+    // ✅ OTP Validation
+    public void OtpValidationField() throws InterruptedException {
+        for (int i = 0; i < 4; i++) {
+            switch (i) {
+                // 1️⃣ Blank OTP
+                case 0:
+                    waitForElement(SubmitOtpSignup);
+                    SubmitOtpSignup.click();
+                    waitForElement(InvalidOtpMsgOkBtnSignup);
+                    InvalidOtpMsgOkBtnSignup.click();
+                    break;
+
+                // 2️⃣ OTP less than 6 digits
+                case 1:
+                    waitForElement(EnterotpSignup);
+                    EnterotpSignup.click();
+                    EnterotpSignup.sendKeys("1234");
+                    SubmitOtpSignup.click();
+                    waitForElement(InvalidOtpMsgSignup);
+                    Assert.assertTrue(InvalidOtpMsgSignup.isDisplayed(), "Invalid OTP validation pop is not displayed when OTP is less than 6 digits.");
+                    InvalidOtpMsgOkBtnSignup.click();
+                    EnterotpSignup.clear();
+                    break;
+
+                // 3️⃣ Invalid 6-digit OTP
+                case 2:
+                    waitForElement(EnterotpSignup);
+                    EnterotpSignup.sendKeys("123477");
+                    SubmitOtpSignup.click();
+                    waitForElement(InvalidOtpMsgSignup);
+                    Assert.assertTrue(InvalidOtpMsgSignup.isDisplayed(), "Invalid OTP validation pop is not displayed for incorrect OTP.");
+                    InvalidOtpMsgOkBtnSignup.click();
+                    EnterotpSignup.clear();
+                    break;
+
+                // 4️⃣ Block account after 3 invalid attempts
+                case 3:
+                    waitForElement(EnterotpSignup);
+                    EnterotpSignup.sendKeys("123477");
+                    SubmitOtpSignup.click();
+                    waitForElement(BlockAccountMsgSignup);
+                    Assert.assertTrue(BlockAccountMsgSignup.isDisplayed(), "Block account error message not displayed after 3 failed attempts.");
+                    BlockAccountMsgOKBTnSignup.click();
+                    break;
+            }
+        }
+
+        // ✅ New valid OTP flow
+        waitForElement(ChangeNumberSignup);
+        ChangeNumberSignup.click();
+        waitForElement(MobileNumberSignup);
+        String number = rumbergenrater();
+        MobileNumberSignup.sendKeys(number);
+        OTPgenrateSignup.click();
+        waitForElement(EnterotpSignup);
+        EnterotpSignup.sendKeys("123456");
+        waitForElement(SubmitOtpSignup);
+        SubmitOtpSignup.click();
+    }
+}

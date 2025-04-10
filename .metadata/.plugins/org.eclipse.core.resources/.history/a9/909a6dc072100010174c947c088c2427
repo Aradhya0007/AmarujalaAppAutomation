@@ -1,0 +1,16 @@
+package user;
+
+import java.time.Duration;
+
+import org.testng.annotations.Test;
+
+import basetest.Basecode;
+
+
+public class AutomationAos extends Basecode {
+	  @Test  // ✅ This is required for TestNG to detect the test
+	    public void sampleTestMethod() {
+	        System.out.println("Running Test...");
+	    }
+    
+}

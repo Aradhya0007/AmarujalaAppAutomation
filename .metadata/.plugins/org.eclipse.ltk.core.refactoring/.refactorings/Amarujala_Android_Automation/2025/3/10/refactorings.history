@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Move element &apos;config.properties&apos; to &apos;jeevanjali_one_user_flow/src/main/java/resourses&apos;&#x0D;&#x0A;- Original project: &apos;jeevanjali_one_user_flow&apos;&#x0D;&#x0A;- Destination element: &apos;jeevanjali_one_user_flow/src/main/java/resourses&apos;&#x0D;&#x0A;- Original element: &apos;config.properties&apos;&#x0D;&#x0A;- Update references to refactored element" description="Move file" destination="/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;resourses" element1="src/main/java/config.properties" files="1" flags="589830" folders="0" id="org.eclipse.jdt.ui.move" policy="org.eclipse.jdt.ui.moveResources" qualified="false" references="true" stamp="1741175170141" units="0" version="1.0"/>
+</session>

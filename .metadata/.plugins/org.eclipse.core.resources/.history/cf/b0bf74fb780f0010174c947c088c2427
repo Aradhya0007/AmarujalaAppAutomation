@@ -1,0 +1,41 @@
+package jeevanjali;
+
+import java.time.Duration;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.annotations.Test;
+
+import basetest.Abstract;
+import io.appium.java_client.android.AndroidDriver;
+
+public class Logout extends Abstract {
+	AndroidDriver driver;
+
+    public Logout(AndroidDriver driver) { 
+    	super(driver);
+        this.driver = driver;
+    }
+    @Test
+    public void logout() throws InterruptedException {
+    	contexts();
+    	WebDriverWait wait =waitingtime(10);
+    	profilebtn();
+    	WebElement back= wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//body/div[1]/div[1]/div[2]/div[1]/div[1]/a[1]/img[1]")));
+    	back.click();
+    	scrollvertical(200);
+    	WebElement logoutbtn= wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//body/div[1]/div[1]/div[1]/ul[1]/li[7]/a[1]")));
+    	logoutbtn.click();
+    	
+    	
+    	
+
+		
+		
+		
+		
+    }
+}

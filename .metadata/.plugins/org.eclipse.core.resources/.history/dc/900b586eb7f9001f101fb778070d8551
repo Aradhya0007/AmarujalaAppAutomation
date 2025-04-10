@@ -1,0 +1,25 @@
+package jeevanjali;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import basetest.Abstract;
+import io.appium.java_client.android.AndroidDriver;
+
+public class Humbergermenu extends Abstract{
+	WebDriver driver;
+	public Humbergermenu(AndroidDriver driver) {
+		super(driver);
+		this.driver =driver;
+		
+	}
+	WebDriverWait wait =waitingtime(10);
+	//funtion
+	public void humlist() {
+		contexts();
+		humberger();
+	}
+
+	
+
+}

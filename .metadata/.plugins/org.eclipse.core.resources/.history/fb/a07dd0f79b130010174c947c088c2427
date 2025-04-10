@@ -1,0 +1,262 @@
+package Signup;
+
+import java.time.Duration;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
+
+import basetest.Abstract;
+import io.appium.java_client.android.AndroidDriver;
+
+public class profiledetailsignup extends Abstract {
+	AndroidDriver driver;
+	WebDriverWait wait;
+	 
+	public profiledetailsignup(AndroidDriver driver) {
+		super(driver);
+		this.driver=driver;
+		PageFactory.initElements(driver, this);  
+	}
+	
+	
+	
+	//Form locator
+	
+	//name
+	@FindBy(xpath = "(//android.widget.EditText)[1]")
+	WebElement ProfileNameSignup;
+	
+	//DOB
+	@FindBy(xpath = "//android.widget.EditText[@text=\"जन्मतिथि चुनें*\"]")
+	WebElement DOBSignup;
+	
+
+	//Calendar Ok btn
+	
+	@FindBy(xpath = "//android.widget.Button[@resource-id=\"android:id/button1\"]")
+	WebElement CalendarOkBtnSignup;
+	
+	//Gender
+	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"महिला\"]")
+	WebElement GenderSignup;
+	
+	//Password
+	@FindBy(xpath = "(//android.widget.EditText)[3]")
+	WebElement PasswordSignup;
+	
+	//View Password
+	@FindBy(xpath = "//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[6]/android.view.ViewGroup/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView/com.horcrux.svg.GroupView/com.horcrux.svg.PathView[2]")
+	WebElement ViewPasswordSignup;
+	
+	//Terms ticker
+	@FindBy(xpath = "//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[7]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView/com.horcrux.svg.GroupView/com.horcrux.svg.PathView[2]")
+	WebElement TermsTickerSignup;
+	
+	//Services Ticker
+	@FindBy(xpath = "//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[8]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView/com.horcrux.svg.GroupView/com.horcrux.svg.PathView[2]")
+	WebElement ServicesTickerSignup;
+	
+	//Go ahead btn
+	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"आगे बढ़ें\"]")
+	WebElement GoAheadSignup;
+	
+	
+	//location locator...................
+	
+    // Loaction search bar
+	@FindBy(xpath = "//android.widget.FrameLayout[@resource-id=\"android:id/content\"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.view.ViewGroup/android.view.ViewGroup")
+	WebElement SearchLocation;
+	
+	//Location to follow
+	@FindBy(xpath = "(//android.view.ViewGroup[@content-desc=\"फॉलो\"])[1]")
+	WebElement FollowLocation;
+	
+	//Location page GoAhead
+	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"आगे बढ़ें\"]")
+	WebElement GoAheadLocation;
+	
+	
+	//Select the intrest......
+	
+	//desh select
+	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"देश\"]")
+	WebElement DeshIntrest;
+	
+	
+	
+	
+	//validation for name 
+	
+	@FindBy(xpath = "//android.widget.TextView[@text=\"मान्य नाम दर्ज करें\"]")
+	WebElement ValidationNameMSgSignup;
+	
+	//validation for DOB 
+	@FindBy(xpath = "//android.widget.TextView[@text=\"जन्मतिथि चुनें*\"]")
+	WebElement ValidationDobMsgSignup;
+	
+	//validation for Gender
+	@FindBy(xpath = "//android.widget.TextView[@text=\"जेंडर चुनें\"]")
+	WebElement ValidationGenderMsgSignup;
+	
+	//validation for Password
+	@FindBy(xpath = "//*[contains(@text, 'आपका पासवर्ड') and contains(@text, 'विशेष अक्षर') and contains(@text, 'उदाहरण')]")
+	WebElement ValidationPasswordSignup;
+	
+	//validation Terms and condition
+	@FindBy(xpath = "//android.widget.TextView[@text=\"हमारी नियम-शर्तों को स्वीकार करें\"]")
+	WebElement ValidationTermsConditionSignup;
+	
+	//Validation msg when we search not valid cirt or state
+	@FindBy(xpath = "//android.widget.TextView[@text=\"कोई शहर नहीं मिला, कृपया पुनः प्रयास करें\"]")
+	WebElement WrongLocatioSelectValidationMsg;
+	
+	
+
+	public void ProfilevalidationSignup() throws InterruptedException {
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+		//empty form submit
+		GoAheadSignup.click();
+		Assert.assertTrue( ValidationDobMsgSignup.isDisplayed(),"Dob detail in profile form after signup validation msg not comming ");
+		Assert.assertTrue( ValidationGenderMsgSignup.isDisplayed(), "Gender detail in profile form after signup validation msg not comming");
+		Assert.assertTrue( ValidationNameMSgSignup.isDisplayed(),"Name validation msg is not coming in profile form");
+		Assert.assertTrue( ValidationPasswordSignup.isDisplayed(),"Password Validation msg in profile is not coming");
+		scrollUntilElementVisible( By.xpath("//android.view.ViewGroup[@content-desc='आगे बढ़ें']") , 2,"up");
+		Assert.assertTrue( ValidationTermsConditionSignup.isDisplayed(),"Validation msg is not comming when we did not ticked the terms and codition in profile form page");
+		DobAndGenderValidation();
+	}
+	public void DobAndGenderValidation() throws InterruptedException {
+		scrollUntilElementVisible(By.xpath("//android.widget.EditText[@text=\"पूरा नाम*\"]") , 2,"down");
+		ProfileNameSignup.sendKeys("TestAutomation");
+		PasswordSignup.sendKeys("Test123@");
+		ViewPasswordSignup.click();
+		driver.hideKeyboard();
+		TermsTickerSignup.click();
+		ServicesTickerSignup.click();
+		GoAheadSignup.click();
+		Assert.assertTrue( ValidationDobMsgSignup.isDisplayed(),"Dob detail in profile form after signup validation msg not comming ");
+		Assert.assertTrue( ValidationGenderMsgSignup.isDisplayed(), "Gender detail in profile form after signup validation msg not comming");
+		ProfileNameValidationProfile();
+	}
+	
+	public void ProfileNameValidationProfile() throws InterruptedException {
+		DOBSignup.click();
+		CalendarOkBtnSignup.click();
+		
+		GenderSignup.click();
+////////////////////Problem dev side/////////////////
+		//ProfileNameSignup.clear();
+		//GoAheadSignup.click();
+		//Assert.assertTrue( ValidationNameMSgSignup.isDisplayed(),"Name validation msg is not coming in profile form");
+		//ProfileNameSignup.sendKeys("TestAutomation1");
+		PasswordValidationProfile();
+		
+	}
+	
+	public void PasswordValidationProfile() throws InterruptedException {
+		
+		//clear case
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+		PasswordSignup.clear();
+		scrollUntilElementVisible( By.xpath("//android.view.ViewGroup[@content-desc='आगे बढ़ें']") , 2,"up");
+		GoAheadSignup.click();
+		Assert.assertTrue( ValidationPasswordSignup.isDisplayed(),"Password Validation msg in profile is not coming");
+		
+		
+		//less then 8 character
+		PasswordSignup.sendKeys("Ajaj12@");
+		GoAheadSignup.click();
+		Assert.assertTrue( ValidationPasswordSignup.isDisplayed(),"Password Validation form msg not coming");
+		PasswordSignup.clear();
+		
+		
+		//No uppercase
+		PasswordSignup.sendKeys("ajaj123@");
+		GoAheadSignup.click();
+		Assert.assertTrue( ValidationPasswordSignup.isDisplayed(),"Password Validation form msg not coming");
+		PasswordSignup.clear();
+		
+		//No special char case
+		PasswordSignup.sendKeys("ajaj1234");
+		GoAheadSignup.click();
+		Assert.assertTrue( ValidationPasswordSignup.isDisplayed(),"Password Validation form msg not coming");
+		PasswordSignup.clear();
+		
+		//No lower Case
+		PasswordSignup.sendKeys("AJAJAJ1234");
+		GoAheadSignup.click();
+		Assert.assertTrue( ValidationPasswordSignup.isDisplayed(),"Password Validation form msg not coming");
+		PasswordSignup.clear();
+		
+		//No Number 
+		PasswordSignup.sendKeys("AJAJAJ1234");
+		GoAheadSignup.click();
+		Assert.assertTrue( ValidationPasswordSignup.isDisplayed(),"Password Validation form msg not coming");
+		PasswordSignup.clear();
+		
+		//No char
+		PasswordSignup.sendKeys("12345@129");
+		GoAheadSignup.click();
+		Assert.assertTrue( ValidationPasswordSignup.isDisplayed(),"Password Validation form msg not coming");
+		PasswordSignup.clear();
+		
+		//valid pass
+		PasswordSignup.sendKeys("Test123@");
+		
+		
+		TickerValidationPRofile();
+		
+	}
+	
+	public void TickerValidationPRofile() throws InterruptedException {
+		
+		//Both are not ticked
+		TermsTickerSignup.click();
+		ServicesTickerSignup.click();
+		GoAheadSignup.click();
+		Assert.assertTrue( ValidationTermsConditionSignup.isDisplayed(),"Validation msg is not comming when we did not ticked the terms and codition in profile form page");
+		
+		//Terms ticker is ticked only
+		TermsTickerSignup.click();
+		GoAheadSignup.click();
+		Assert.assertTrue( ValidationTermsConditionSignup.isDisplayed(),"Validation msg is not comming when we did not ticked the terms and codition in profile form page");
+		
+		//Service ticker is ticked only
+		TermsTickerSignup.click();//already ticked i unticked
+		ServicesTickerSignup.click();
+		GoAheadSignup.click();
+		Assert.assertTrue( ValidationTermsConditionSignup.isDisplayed(),"Validation msg is not comming when we did not ticked the terms and codition in profile form page");
+		TermsTickerSignup.click();
+		
+		//all validation done
+		GoAheadSignup.click();
+		
+		LocationSelect();
+	}
+	
+	public void LocationSelect() {
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+		//wrong location
+		SearchLocation.click();
+		SearchLocation.sendKeys("delhihhdhdhd");
+		Assert.assertTrue(WrongLocatioSelectValidationMsg.isDisplayed(), "if wrong city is search no msg is displayed");
+		//Correct Loaction
+		SearchLocation.clear();
+		SearchLocation.sendKeys("Delhi");
+		FollowLocation.click();
+		GoAheadLocation.click();
+		IntrestSelect();
+		
+	}
+	
+	public void IntrestSelect() {
+		DeshIntrest.click();
+		GoAheadLocation.click();
+	}
+	
+	
+}

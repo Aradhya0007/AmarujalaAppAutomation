@@ -1,0 +1,57 @@
+package basetest;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+
+import io.appium.java_client.android.AndroidDriver;
+import resourses.Configreader;
+import io.appium.java_client.AppiumDriver;
+
+public class Basecode {
+	public AndroidDriver driver;  // Declare driver globally
+
+    @BeforeClass
+    public void setUp() throws MalformedURLException {
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+        Map<String, Object> ltOptions = new HashMap<>();
+
+        // Fetch values dynamically from config.properties
+        String userName = Configreader.getProperty("username");
+        String accessKey = Configreader.getProperty("accessKey");
+        String gridURL = Configreader.getProperty("gridURL");  
+
+        ltOptions.put("deviceName", Configreader.getProperty("deviceName"));
+        ltOptions.put("platformVersion", Configreader.getProperty("platformVersion"));
+        ltOptions.put("platformName", Configreader.getProperty("platformName"));
+        ltOptions.put("app", Configreader.getProperty("app"));
+        ltOptions.put("build", Configreader.getProperty("build"));
+        ltOptions.put("name", Configreader.getProperty("name"));
+        ltOptions.put("project", Configreader.getProperty("project"));
+        ltOptions.put("isRealMobile", Boolean.parseBoolean(Configreader.getProperty("isRealMobile")));
+        ltOptions.put("debug", Boolean.parseBoolean(Configreader.getProperty("debug")));
+        ltOptions.put("console", Boolean.parseBoolean(Configreader.getProperty("console")));
+        ltOptions.put("network", Boolean.parseBoolean(Configreader.getProperty("network")));
+
+        capabilities.setCapability("lt:options", ltOptions);
+        
+        // Correctly format the hub URL
+        String hub = "https://" + userName + ":" + accessKey + "@" + gridURL;
+        driver = new AndroidDriver(new URL(hub), capabilities);
+    
+    }
+
+    @AfterClass
+    public void tearDown() {
+        if (driver != null) {
+            driver.quit();
+        }
+    }
+}

@@ -1,0 +1,62 @@
+package basetest;
+
+import java.time.Duration;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import io.appium.java_client.android.AndroidDriver;
+
+public class Abstract {
+	AndroidDriver driver;
+	JavascriptExecutor js ;
+	WebDriverWait wait;
+	public Abstract(AndroidDriver driver) {
+		this.driver=driver;
+		this.js=driver;
+	}
+	//HOMEPAGE  HEADER
+//-----------------------------------------------------------------------------------------------//
+	
+	//Humberger btn
+	public void humberger() {
+		WebElement hum = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".myjyotish_sprite.threebar_icon")));
+    	hum.click();
+	}
+	
+	//HOMEPAGE  FOOTER
+//---------------------------------------------------------------------------------------//
+	
+	//profile btn 
+	public void profilebtn() {
+		WebElement profilebtn= wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[@class='login-icon']")));
+    	profilebtn.click();
+	}
+	
+	
+	
+	
+	
+	
+	
+	//javascript
+	public void scrollvertical(int valued) {
+		js.executeScript("window.scrollBy(0, arguments[0])", valued);
+	}
+	
+	//wait
+	public WebDriverWait waitingtime(int time) {
+		wait = new WebDriverWait(driver, Duration.ofSeconds(time));
+		return wait;
+	}
+	
+	//contextswitch
+	public void contexts() {
+		System.out.println(driver.getContextHandles());
+		driver.context("WEBVIEW_com.amarujala.myjyotish");
+	}
+
+}

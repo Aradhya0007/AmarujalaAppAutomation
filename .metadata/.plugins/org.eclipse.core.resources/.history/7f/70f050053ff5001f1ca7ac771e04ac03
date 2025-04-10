@@ -1,0 +1,38 @@
+package jeevanjali;
+
+import java.time.Duration;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.annotations.Test;
+
+import basetest.Abstract;
+import io.appium.java_client.android.AndroidDriver;
+
+public class Homepage extends Abstract   {
+	AndroidDriver driver;
+
+    public Homepage(AndroidDriver driver) { 
+    	super(driver);
+        this.driver = driver;
+    }
+	@Test
+	public void homefeature() {
+		driver.context("WEBVIEW_com.amarujala.myjyotish");
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+		scrollvertical(500);
+		WebElement viewmore = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'और पढ़ें ›')]")));
+    	viewmore.click();
+    	driver.context("NATIVE_APP");
+    	WebElement Humberger = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[@class='nav-open menu-icn-hamburger']")));
+    	Humberger.click();
+    	
+    	
+    	
+		
+		
+	}
+
+}

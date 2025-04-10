@@ -1,0 +1,167 @@
+package login;
+
+import java.time.Duration;
+
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+import org.testng.Assert;
+
+import Signup.signupflowmakenewaccount;
+import basetest.Abstract;
+import io.appium.java_client.android.AndroidDriver;
+
+public class Popuplogin extends Abstract {
+	AndroidDriver driver;
+	public Popuplogin(AndroidDriver driver) {
+		super(driver);
+		// TODO Auto-generated constructor stub
+		this.driver=driver;
+		PageFactory.initElements(driver, this); 
+	}
+	//locator 
+	
+	//change number 
+			@FindBy(xpath="//android.widget.TextView[@text='मोबाइल नंबर बदलें']")
+			WebElement ChangeNumberloginAndSignup;
+		
+			
+			//enter opt container
+			@FindBy(xpath="(//android.widget.TextView[@text='-'])[1]")
+			WebElement EnterotploginAndSignup;
+			
+			//otp submit btn
+			@FindBy(xpath="//android.view.ViewGroup[@content-desc=\"ओटीपी सत्यापित करें\"]")
+			WebElement SubmitOtploginAndSignup;
+	
+	//enter mobile number 
+		@FindBy(xpath="//android.widget.EditText")
+		WebElement EnterMobileNumberLoginAndSignup;
+	//submit the number 	
+	@FindBy(xpath="//android.view.ViewGroup[@content-desc=\"सबमिट\"]")
+	WebElement SubmitloginAndSignup;
+	
+	//msg if invalid number is field 
+	@FindBy(xpath="//android.widget.TextView[@text=\"कृपया एक वैध नंबर डालें\"]")
+	WebElement ValidationNumberMsgPopupSignuploginAndSignup;
+	
+	//validation msg when we have filled otp less then 6 digit 
+	@FindBy(xpath="//android.widget.TextView[@resource-id='android:id/message' and @text='Please enter valid OTP']")
+	WebElement ValidationOtpMsgpPopuploginAndSignup;
+	
+	//when otp is six digit but it is invalid
+	@FindBy(xpath="//android.widget.TextView[@resource-id='android:id/message' and @text='Invalid OTP']")
+	WebElement ValidationErrorPopuploginAndSignup;
+	
+	//ok btn
+	@FindBy(xpath="//android.widget.Button[@resource-id=\"android:id/button1\"]")
+	WebElement OKBtnPopuploginAndSignup;
+	
+	//block otp error in msg
+	@FindBy(xpath="//android.widget.TextView[@resource-id='android:id/message' and @text='Account blocked, Please try after few minutes']")
+	WebElement BlockErrorMsgloginAndSignup;
+	
+	public void PopupBasedLoginAndSignup() throws InterruptedException {
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+		
+		//blank
+		SubmitloginAndSignup.click();
+		Assert.assertTrue(ValidationNumberMsgPopupSignuploginAndSignup.isDisplayed(),"validation msg is not coming in case of invalid otp");
+		
+		
+		
+		//invalid number less then 10 digit
+		Thread.sleep(2000);
+		EnterMobileNumberLoginAndSignup.sendKeys("123456784");
+		SubmitloginAndSignup.click();
+		Assert.assertTrue(ValidationNumberMsgPopupSignuploginAndSignup.isDisplayed(),"validation msg is not coming in case of invalid otp");
+		EnterMobileNumberLoginAndSignup.clear();
+		
+		
+		//Correct number 
+		EnterMobileNumberLoginAndSignup.sendKeys("1234567899");
+		SubmitloginAndSignup.click();
+		 
+		 
+		//otp validation 
+		 otpcheckinpopwindow();
+		 
+		 
+		 //change number
+		 ChangeNumberloginAndSignup.click();
+		 //CHECK WITH SAME NUMBER ...To Fix
+//		 EnterMobileNumberLoginAndSignup.sendKeys("1234567899");
+//		 SubmitloginAndSignup.click();
+		 
+		 EnterMobileNumberLoginAndSignup.clear();
+		 EnterMobileNumberLoginAndSignup.sendKeys("1234567888");
+		 SubmitloginAndSignup.click();
+			EnterotploginAndSignup.click();
+			enterOtpUsingKeyboard("123456");
+			driver.hideKeyboard();
+			SubmitOtploginAndSignup.click();
+			
+			
+	}
+	
+	
+		public void otpcheckinpopwindow() throws InterruptedException {
+			 driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
+			for (int i=0;i<5;i++) {
+				
+				//SubmitOtpSignup.click();
+				//first keeping blank
+				if(i==0) {
+					
+					Thread.sleep(2000);
+					driver.hideKeyboard();
+					SubmitOtploginAndSignup.click();
+					Thread.sleep(2000);
+					Assert.assertTrue(ValidationOtpMsgpPopuploginAndSignup.isDisplayed(), "invalid OTP validation pop is not coming when less then 6 digit ");
+					OKBtnPopuploginAndSignup.click();
+				}
+				// otp less then 6 digit
+				if(i==1) {
+					Thread.sleep(2000);
+					EnterotploginAndSignup.click();
+					enterOtpUsingKeyboard("1234");
+					driver.hideKeyboard();
+					SubmitOtploginAndSignup.click();
+					Assert.assertTrue(ValidationOtpMsgpPopuploginAndSignup.isDisplayed(), "invalid OTP validation pop is not coming when less then 6 digit ");
+					OKBtnPopuploginAndSignup.click();
+					clearotp();
+				}
+				//invalid 6 digit otp
+				if(i==2) {
+					EnterotploginAndSignup.click();
+					enterOtpUsingKeyboard("123444");
+					driver.hideKeyboard();
+					SubmitOtploginAndSignup.click();
+					Assert.assertTrue(ValidationErrorPopuploginAndSignup.isDisplayed(), "invalid OTP validation pop is not coming when OTP is not valid");
+					OKBtnPopuploginAndSignup.click();
+					clearotp(); 
+					
+				}
+				//after 3 wrong OTP Account block error pop up
+				if(i==3) {
+					EnterotploginAndSignup.clear();
+					enterOtpUsingKeyboard("123444");
+					driver.hideKeyboard();
+					SubmitOtploginAndSignup.click();
+					Assert.assertTrue(ValidationErrorPopuploginAndSignup.isDisplayed(), "invalid OTP validation pop is not coming when OTP is not valid");
+					OKBtnPopuploginAndSignup.click();
+					
+					SubmitOtploginAndSignup.click();
+					Assert.assertTrue(ValidationErrorPopuploginAndSignup.isDisplayed(), "invalid OTP validation pop is not coming when OTP is not valid");
+					OKBtnPopuploginAndSignup.click();
+					
+					SubmitOtploginAndSignup.click();
+					Assert.assertTrue(BlockErrorMsgloginAndSignup.isDisplayed(), "Block account error msg not comming after 3 attempt fail");
+					OKBtnPopuploginAndSignup.click();
+				}
+			}
+		}
+	}
+	
+
+

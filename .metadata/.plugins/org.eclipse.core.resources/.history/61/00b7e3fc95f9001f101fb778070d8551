@@ -1,0 +1,46 @@
+package jeevanjali;
+
+import java.time.Duration;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.annotations.Test;
+
+import basetest.Abstract;
+import io.appium.java_client.android.AndroidDriver;
+
+public class Homepage extends Abstract   {
+	AndroidDriver driver;
+
+    public Homepage(AndroidDriver driver) { 
+    	super(driver);
+        this.driver = driver;
+    }
+	@Test
+	public void homefeature() throws InterruptedException {
+		driver.context("WEBVIEW_com.amarujala.myjyotish");
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+		scrollvertical(500);
+		WebElement viewmore = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'और पढ़ें ›')]")));
+    	viewmore.click();
+    	driver.context("WEBVIEW_com.amarujala.myjyotish");
+    	//System.out.println(driver.getPageSource());
+    	//WebElement pooja= wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//header/div[2]/div[1]/div[1]/div[1]/div[1]/nav[1]/div[1]/ul[1]/li[3]/a[1]")));
+    	//pooja.click();
+    	
+    	WebElement jotish= wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//nav//div//ul//li//a[@title='ज्योतिषी से बात करें']")));
+    	jotish.click();
+    	scrollvertical(500);
+    	Thread.sleep(2000);
+    	
+    	
+    	
+    	
+    	
+		
+		
+	}
+
+}

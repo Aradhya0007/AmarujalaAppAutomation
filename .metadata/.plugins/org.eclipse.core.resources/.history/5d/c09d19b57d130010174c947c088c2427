@@ -1,0 +1,231 @@
+package basetest;
+
+import java.time.Duration;
+import java.util.Collections;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Random;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.PointerInput;
+import org.openqa.selenium.interactions.Sequence;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import io.appium.java_client.AppiumBy;
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.android.nativekey.AndroidKey;
+import io.appium.java_client.android.nativekey.KeyEvent;
+
+public class Abstract {
+	AndroidDriver driver;
+	JavascriptExecutor js ;
+	WebDriverWait wait;
+	
+	public Abstract(AndroidDriver driver) {
+		this.driver=driver;
+		this.js=driver;
+		PageFactory.initElements(driver, this);
+	}
+	
+	
+	
+	
+	
+	
+	
+	//footer Navigation.........................................................
+	
+	//menu
+	@FindBy(xpath="//android.widget.TextView[@text=\"मेन्यू\"]")
+	WebElement Menu;
+	
+	
+
+	public void menu() {
+		Menu.click();
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//Signup/Login common thing.....................................................
+	
+	
+	@FindBy(xpath="//android.widget.TextView[@text=\"लॉगइन करें\"]")
+	WebElement MenuLoginbtn;
+	
+	@FindBy(xpath="//android.view.ViewGroup[@content-desc=\"प्रीमियम\"]")
+	WebElement Premiumbtn;
+	
+	@FindBy(xpath="//android.view.ViewGroup[@content-desc=\"ई-पेपर\"]")
+	WebElement Epaperbtn;
+	
+	 
+	
+	public void menuLoginbtn() {
+		MenuLoginbtn.click();
+	}
+	
+	public void premiumbtn() {
+		Premiumbtn.click();
+		
+	}
+	
+	public void epaper() {
+		 Epaperbtn.click();
+	}
+	
+	
+
+	//Rondom number genrater 
+	public String rumbergenrater() {
+		Random random = new Random();
+		int randomDigits = 1000000 + random.nextInt(9000000);
+		String randomNumber = "123" + randomDigits;
+		return randomNumber;
+	}
+	
+	
+//	clear otp
+	public void clearotp() {
+		driver.findElement(
+			    AppiumBy.androidUIAutomator("new UiSelector().resourceId(\"otp-input\").instance(5)")
+			).click();
+		for(int i=6;i>0;i--) {
+			driver.pressKey(new KeyEvent(AndroidKey.DEL));
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	
+	//Common for all class.........................................................
+
+	//javascript
+	public void scrollvertical(int valued) {
+		js.executeScript("window.scrollBy(0, arguments[0])", valued);
+	}
+	
+	//wait
+	public WebDriverWait waitingtime(int time) {
+		wait = new WebDriverWait(driver, Duration.ofSeconds(time));
+		return wait;
+	}
+	
+	//contextswitch
+	public void contexts() {
+		System.out.println(driver.getContextHandles());
+		driver.context("WEBVIEW_com.amarujala.myjyotish");
+	}
+	
+	
+	
+	//keybord input
+	public void enterOtpUsingKeyboard(String otp) {
+	    for (char digit : otp.toCharArray()) {
+	        AndroidKey key = getKeyForDigit(digit);
+	        if (key != null) {
+	            driver.pressKey(new KeyEvent(key));
+	        }
+	    }
+	}
+
+	// Helper method to map digits to AndroidKey
+	private AndroidKey getKeyForDigit(char digit) {
+	    switch (digit) {
+	        case '0': return AndroidKey.DIGIT_0;
+	        case '1': return AndroidKey.DIGIT_1;
+	        case '2': return AndroidKey.DIGIT_2;
+	        case '3': return AndroidKey.DIGIT_3;
+	        case '4': return AndroidKey.DIGIT_4;
+	        case '5': return AndroidKey.DIGIT_5;
+	        case '6': return AndroidKey.DIGIT_6;
+	        case '7': return AndroidKey.DIGIT_7;
+	        case '8': return AndroidKey.DIGIT_8;
+	        case '9': return AndroidKey.DIGIT_9;
+	        default: return null;
+	    }
+	}
+	
+	
+	
+	
+	//Slide up an down 
+	
+	public void scrollUntilElementVisible( By locator,int Scrollnumber) {
+	    int maxScrolls = Scrollnumber;
+	    int scrollCount = 0;
+
+	    while (scrollCount < maxScrolls) {
+	    	 List<WebElement> elements = driver.findElements(locator);
+
+	         if (!elements.isEmpty()) {
+	             WebElement element = elements.get(0);
+	             if (element.isDisplayed()) {
+	                 System.out.println("Element found and visible!");
+	                 return;
+	             }
+	            // Element not found yet, keep scrolling
+	            swipeUp();
+	            scrollCount++;
+	        }
+	    }
+	    System.out.println("Element not found after scrolling.");
+	}
+
+	public void swipeUp() {
+	    Dimension size = driver.manage().window().getSize();
+	    int startX = size.width / 2;
+	    int startY = (int) (size.height * 0.8);
+	    int endY = (int) (size.height * 0.3);
+
+	    PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger1");
+	    Sequence swipe = new Sequence(finger, 1);
+
+	    swipe.addAction(finger.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), startX, startY));
+	    swipe.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+	    swipe.addAction(finger.createPointerMove(Duration.ofMillis(500), PointerInput.Origin.viewport(), startX, endY));
+	    swipe.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+
+	    driver.perform(Collections.singletonList(swipe));
+	}
+	
+
+}
+

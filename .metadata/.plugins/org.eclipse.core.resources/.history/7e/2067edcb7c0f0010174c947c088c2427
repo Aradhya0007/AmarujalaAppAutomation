@@ -1,0 +1,58 @@
+package basetest;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.AppiumDriver;
+
+public class Basecode {
+    public AndroidDriver driver;  // Declare driver globally
+
+    String userName = System.getenv("LT_USERNAME") == null ? "aradhya.joshi" : System.getenv("LT_USERNAME");
+    String accessKey = System.getenv("LT_ACCESS_KEY") == null ? "LT_HyRXXZfocKnanJQFWi0b4MBDcter6h1AScTukiiotMzvgwM" : System.getenv("LT_ACCESS_KEY");
+    public String gridURL = "@mobile-hub.lambdatest.com/wd/hub";
+
+    @BeforeClass
+    public void setUp() throws MalformedURLException {
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+        Map<String, Object> ltOptions = new HashMap<>();
+
+        ltOptions.put("deviceName", "Realme C21 Y");
+        ltOptions.put("platformVersion", "11");
+        ltOptions.put("platformName", "Android");
+        ltOptions.put("app", "lt://APP1016053901741151360528599");
+        //ltOptions.put("autoWebview", true); // Ensure the app ID is correct
+        ltOptions.put("build", "Myjotish");
+        ltOptions.put("name", "userflow");
+        ltOptions.put("project", "demo");
+        ltOptions.put("isRealMobile", true);
+        ltOptions.put("debug", true);
+        ltOptions.put("console", true);
+        ltOptions.put("network", true);
+
+        capabilities.setCapability("lt:options", ltOptions);
+        //capabilities.setCapability("autoWebview", true); 
+        String hub = "https://" + userName + ":" + accessKey + gridURL;
+
+        driver = new AndroidDriver(new URL(hub), capabilities);
+       // driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        
+
+    }
+
+    @AfterClass
+    public void tearDown() {
+        if (driver != null) {
+            driver.quit();
+        }
+    }
+}
