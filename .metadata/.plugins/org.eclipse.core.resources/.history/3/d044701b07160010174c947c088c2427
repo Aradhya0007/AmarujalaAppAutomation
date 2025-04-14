@@ -1,0 +1,179 @@
+package Signup;
+
+import java.time.Duration;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+
+import basetest.Abstract;
+import io.appium.java_client.android.AndroidDriver;
+
+public class signupflowmakenewaccount extends Abstract {
+	AndroidDriver driver;
+
+	//enter number for signup page locator......................................................
+
+	//Mobile number durj kare in signup
+	@FindBy(className="android.widget.EditText")
+	WebElement MobileNumberSignup;
+
+	//OTP generate kare in signup
+	@FindBy(xpath="//android.view.ViewGroup[@content-desc=\"ओटीपी जनरेट करें\"]")
+	WebElement OTPgenrateSignup;
+
+	//Ok btn on invalid error msg when invalid number entered
+	@FindBy(xpath="//android.widget.Button[@resource-id=\"android:id/button1\"]")
+	WebElement InvalidNumberErrorOKSignup;
+
+	//otp page locator ............................................................
+
+	//enter opt container
+	@FindBy(xpath="(//android.widget.TextView[@text='-'])[1]")
+	WebElement EnterotpSignup;
+
+	//otp submit btn
+	@FindBy(xpath="//android.view.ViewGroup[@content-desc=\"ओटीपी सत्यापित करें\"]")
+	WebElement SubmitOtpSignup;
+
+	//change number 
+	@FindBy(xpath="//android.widget.TextView[@text='मोबाइल नंबर बदलें']")
+	WebElement ChangeNumberSignup;
+
+	//Invalid OTP msg pop up
+	@FindBy(xpath="//android.widget.TextView[@text=\"Invalid OTP\"]")
+	WebElement InvalidOtpMsgSignup;
+
+	//ok button when invalid otp is enter and popup comes 
+	@FindBy(xpath="//android.widget.TextView[@text=\"OK\"]")
+	WebElement InvalidOtpMsgOkBtnSignup;
+
+	//Account blocked, Please try after few minutes popup error msg
+	@FindBy(xpath="//android.widget.TextView[@text=\"Account blocked, Please try after few minutes\"]")
+	WebElement BlockAccountMsgSignup;
+
+	//block account after 3 attempts then error ok button
+	@FindBy(xpath="//android.widget.TextView[@text=\"OK\"]")
+	WebElement BlockAccountMsgOKBTnSignup;
+
+	public signupflowmakenewaccount(AndroidDriver driver) {
+		super(driver);
+		this.driver = driver;
+		PageFactory.initElements(driver, this);
+	}
+
+	//SIGNUP FLOW FOR MAKE NEW ACCOUNT........................................................
+
+	//Number Page..............................................................................
+	public void validateMobileNumberField() throws InterruptedException {
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+
+		//blank input
+		click(OTPgenrateSignup, "OTP generate button");
+		click(InvalidNumberErrorOKSignup, "Invalid Number OK button");
+		assertDisplayed(driver.findElement(By.xpath("//android.widget.TextView[@text=\"Please enter 10 digit mobile number\"]")), 
+			"10 digit mobile number validation");
+		clear(MobileNumberSignup, "Mobile Number Field");
+
+		//number less than 10 digits
+		sendKeys(MobileNumberSignup, "12309898", "Mobile Number Field");
+		Thread.sleep(2000);
+		click(OTPgenrateSignup, "OTP generate button");
+		click(InvalidNumberErrorOKSignup, "Invalid Number OK button");
+		assertDisplayed(driver.findElement(By.xpath("//android.widget.TextView[@text=\"Please enter 10 digit mobile number\"]")), 
+			"10 digit mobile number validation");
+		clear(MobileNumberSignup, "Mobile Number Field");
+
+		//Valid case
+		String number = rumbergenrater();
+		sendKeys(MobileNumberSignup, number, "Mobile Number Field");
+		Thread.sleep(2000);
+		click(OTPgenrateSignup, "OTP generate button");
+
+		OtpValidationField("signup");
+	}
+
+	//OTP Page.................................................................................
+	public void OtpValidationField(String flow) throws InterruptedException {
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
+
+		for (int i = 0; i < 4; i++) {
+
+			if (i == 0) {
+				// first keeping blank
+				Thread.sleep(2000);
+				driver.hideKeyboard();
+				click(SubmitOtpSignup, "Submit OTP Button");
+				Thread.sleep(2000);
+				click(InvalidOtpMsgOkBtnSignup, "Invalid OTP OK Button");
+			}
+
+			if (i == 1) {
+				// OTP less than 6 digits
+				Thread.sleep(2000);
+				click(EnterotpSignup, "Enter OTP Field");
+				enterOtpUsingKeyboard("1234");
+				driver.hideKeyboard();
+				click(SubmitOtpSignup, "Submit OTP Button");
+				assertDisplayed(InvalidOtpMsgSignup, "Invalid OTP validation popup (less than 6 digits)");
+				click(InvalidOtpMsgOkBtnSignup, "Invalid OTP OK Button");
+				clearotp();
+			}
+
+			if (i == 2) {
+				// invalid 6 digit OTP
+				click(EnterotpSignup, "Enter OTP Field");
+				enterOtpUsingKeyboard("123444");
+				driver.hideKeyboard();
+				click(SubmitOtpSignup, "Submit OTP Button");
+				assertDisplayed(InvalidOtpMsgSignup, "Invalid OTP validation popup (invalid OTP)");
+				click(InvalidOtpMsgOkBtnSignup, "Invalid OTP OK Button");
+				clearotp();
+			}
+
+			if (i == 3) {
+				// after 3 wrong OTP, account blocked
+				click(EnterotpSignup, "Enter OTP Field");
+				enterOtpUsingKeyboard("123444");
+				driver.hideKeyboard();
+				click(SubmitOtpSignup, "Submit OTP Button");
+				assertDisplayed(BlockAccountMsgSignup, "Blocked account error message");
+				click(BlockAccountMsgOKBTnSignup, "Blocked Account OK Button");
+
+				if (flow.equals("signup")) {
+					ChangeNumberflow(flow);
+				} else if (flow.equals("login")) {
+					return;
+				}
+			}
+		}
+	}
+
+	// the number is blocked — use change number to regenerate OTP
+	public void blockedOtpNumber() throws InterruptedException {
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
+		driver.hideKeyboard();
+		Thread.sleep(2000);
+		click(ChangeNumberSignup, "Change Number Button");
+		// Note: case not working fine
+	}
+
+	// new number OTP and valid flow page......................................................
+	public void ChangeNumberflow(String flow) throws InterruptedException {
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
+		driver.hideKeyboard();
+		Thread.sleep(3000);
+		click(ChangeNumberSignup, "Change Number Button");
+
+		String number = rumbergenrater();
+		sendKeys(MobileNumberSignup, number, "Mobile Number Field");
+		click(OTPgenrateSignup, "OTP generate button");
+		click(EnterotpSignup, "Enter OTP Field");
+		enterOtpUsingKeyboard("123456");
+		driver.hideKeyboard();
+		click(SubmitOtpSignup, "Submit OTP Button");
+
+		profiledetailsignup ProfileDetails = new profiledetailsignup(driver);
+		ProfileDetails.ProfilevalidationSignup();
+	}
+}

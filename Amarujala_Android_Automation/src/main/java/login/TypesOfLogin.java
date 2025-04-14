@@ -12,51 +12,46 @@ import io.appium.java_client.android.AndroidDriver;
 
 public class TypesOfLogin extends Abstract {
 	AndroidDriver driver;
+
 	public TypesOfLogin(AndroidDriver driver) {
 		super(driver);
-		// TODO Auto-generated constructor stub
-		this.driver=driver;
-		PageFactory.initElements(driver, this);  
+		this.driver = driver;
+		PageFactory.initElements(driver, this);
 	}
-	//locator   
-	//login from pass
-	@FindBy(xpath="//android.widget.TextView[@text='पासवर्ड के जरिए लॉगइन करें']")
+
+	// locator   
+	// login from pass
+	@FindBy(xpath = "//android.widget.TextView[@text='पासवर्ड के जरिए लॉगइन करें']")
 	WebElement Passwordlogin;
-	
-	//Bookmark
-	@FindBy(xpath="//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.view.ViewGroup[3]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView/com.horcrux.svg.GroupView/com.horcrux.svg.PathView")
+
+	// Bookmark
+	@FindBy(xpath = "//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.view.ViewGroup[3]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView/com.horcrux.svg.GroupView/com.horcrux.svg.PathView")
 	WebElement Bookmark;
-	
-	public void   NumberLogin() throws InterruptedException {
+
+	public void NumberLogin() throws InterruptedException {
 		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 		menu();
 		menuLoginbtn();
-		LoginOtpFlow Loginotp=new LoginOtpFlow(driver);
+		LoginOtpFlow Loginotp = new LoginOtpFlow(driver);
 		Loginotp.otploginflow();
 		logitout();
 	}
-	
-	
-    public void   PasswordLogin() throws InterruptedException {
-    	driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+
+	public void PasswordLogin() throws InterruptedException {
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 		menu();
 		menuLoginbtn();
-		Passwordlogin.click();
-		Emailpasslogin passlogin= new Emailpasslogin(driver);
+		click(Passwordlogin, "Login via Password");
+		Emailpasslogin passlogin = new Emailpasslogin(driver);
 		passlogin.loginwithpasswordflow();
 		logitout();
 	}
-    
-   
-    
-    public void PopupLogin() throws InterruptedException {
-    	driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
-    	Bookmark.click();
-    	Popuplogin popuplogin =new Popuplogin(driver);
-    	popuplogin.PopupBasedLoginAndSignup();
-    	logitout();
-    }
-    
- 
 
+	public void PopupLogin() throws InterruptedException {
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+		click(Bookmark, "Bookmark Icon");
+		Popuplogin popuplogin = new Popuplogin(driver);
+		popuplogin.PopupBasedLoginAndSignup();
+		logitout();
+	}
 }

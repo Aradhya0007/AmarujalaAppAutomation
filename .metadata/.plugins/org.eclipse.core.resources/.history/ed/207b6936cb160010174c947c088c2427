@@ -1,0 +1,144 @@
+package pagevalidation;
+
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+
+import basetest.Abstract;
+import io.appium.java_client.android.AndroidDriver;
+
+public class ArticleStatus extends Abstract {
+	AndroidDriver driver;
+	public ArticleStatus(AndroidDriver driver) {
+		super(driver);
+		// TODO Auto-generated constructor stub
+		this.driver=driver;
+	}
+	
+	//locator...
+	// Assuming you're using PageFactory and have initialized with driver
+
+	@FindBy(xpath = "//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup")
+	List<WebElement> cards;
+
+	@FindBy(xpath = "//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.TextView[1]")
+	List<WebElement> cardTitle;
+
+	@FindBy(xpath = "//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.TextView[2]")
+	List<WebElement> cardDate;
+	
+	//go back
+	
+	@FindBy(xpath = "//*[@text=\"पीछे जाएं\"]")
+    WebElement Goback;
+
+	Set<String> openedKeys = new HashSet<>();
+
+	public void validateArticlesUntilTodayEnds() throws Exception {
+		Thread.sleep(2000);
+	    int maxScrolls = 25;
+	    int scrollCount = 0;
+	    
+	    String todayDate = getTodayFormattedInHindi();
+
+	    while (scrollCount < maxScrolls) {
+	        boolean foundNewArticle = false;
+	        boolean reachedOldDate = false;
+
+	        for (int i = 0; i < cards.size(); i++) {
+	            WebElement card = cards.get(i);
+	            String title = "";
+	            String date = "";
+
+	            try {
+	                title = cardTitle.get(i).getText();
+	                date = cardDate.get(i).getText().replace("•", "").trim();;
+	                //String  dates= date.replace("•", "").trim();
+	            } catch (Exception e) {
+	                continue; // Skip cards missing elements
+	            }
+
+	 
+				if (!date.contains(todayDate)) {
+	                System.out.println("\uD83D\uDEA9 Reached article not from today: " + date);
+	                reachedOldDate = true;
+	                break;
+	            }
+
+	            String key = title + card.getLocation().toString();
+
+	            if (!openedKeys.contains(key) && title.trim().length() > 0) {
+	                openedKeys.add(key);
+	                foundNewArticle = true;
+
+	                System.out.println("\uD83D\uDD1F Opening: " + title + " (" + date + ")");
+	                card.click();
+	                
+	                Thread.sleep(3000);
+	                if(i==0) {
+	                	Thread.sleep(3000);
+	                	driver.findElement(By.xpath("//*[@text='Consent']")).click();
+	                }
+
+	                for (String context : driver.getContextHandles()) {
+	                    if (context.contains("WEBVIEW")) {
+	                        driver.context(context);
+	                        break;
+	                    }
+	                }
+	                
+
+	                String url = driver.getCurrentUrl();
+	                System.out.println("\uD83D\uDD17 URL: " + url);
+	                int status = getUrlStatus(url);
+	                System.out.println("\u2705 Status Code: " + status);
+	                
+	               // Goback.click();
+	                Thread.sleep(2000);
+	                driver.context("NATIVE_APP");
+	                driver.navigate().back();
+	                Thread.sleep(2000);
+	                break; // After opening 1 new article, re-evaluate all
+	            }
+	        }
+
+	        if (reachedOldDate) {
+	            System.out.println("\uD83C\uDF89 All today's articles are processed. Exiting.");
+	            break;
+	        }
+
+	        if (!foundNewArticle) {
+	            System.out.println("\uD83D\uDCDC No new article on screen. Scrolling...");
+	            //scrollDown();
+	            scrollCount++;
+	        }
+	    }
+	}
+
+	private String getTodayFormattedInHindi() {
+	    Locale hindi = new Locale("hi", "IN");
+	    SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM", hindi); // 11 अप्रैल
+	    return formatter.format(new Date());
+	}
+
+	private int getUrlStatus(String url) {
+	    try {
+	        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+	        return connection.getResponseCode();
+	    } catch (Exception e) {
+	        System.out.println("❌ URL check failed: " + e.getMessage());
+	        return -1;
+	    }
+	}
+
+
+}

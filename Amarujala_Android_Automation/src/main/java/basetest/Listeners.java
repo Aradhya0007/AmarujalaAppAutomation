@@ -1,9 +1,7 @@
 package basetest;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.ITestContext;
 import org.testng.ITestListener;
@@ -16,50 +14,62 @@ import com.aventstack.extentreports.Status;
 import io.appium.java_client.android.AndroidDriver;
 
 public class Listeners extends Basecode implements ITestListener {
+
     ExtentReports extent = Report.getReportObject();
     ThreadLocal<ExtentTest> extentTest = new ThreadLocal<>();
-    ExtentTest test;
 
     @Override
     public void onTestStart(ITestResult result) {
-        test = extent.createTest(result.getMethod().getMethodName());
+        ExtentTest test = extent.createTest(
+            "🧪 " + result.getMethod().getMethodName(),
+            "Class: " + result.getTestClass().getName()
+        );
         extentTest.set(test);
+        ExtentLogger.extentTest.set(test); // Optional: Use this if you have a custom ExtentLogger class
     }
 
     @Override
     public void onTestSuccess(ITestResult result) {
-        extentTest.get().log(Status.PASS, "Test Passed");
+        extentTest.get().log(Status.PASS, "✅ Test Passed");
     }
 
     @Override
     public void onTestFailure(ITestResult result) {
-        extentTest.get().log(Status.FAIL, "Test Failed");
-        extentTest.get().fail(result.getThrowable());
+        extentTest.get().log(Status.FAIL, "❌ Test Failed");
+        extentTest.get().log(Status.INFO, "📛 Error: " + result.getThrowable());
 
         AndroidDriver driver = null;
         try {
             driver = (AndroidDriver) result.getTestClass().getRealClass().getField("driver").get(result.getInstance());
         } catch (Exception e) {
-            e.printStackTrace();
+            extentTest.get().log(Status.WARNING, "⚠️ Could not access driver to take screenshot.");
         }
 
-        try {
-            String screenshotPath = getScreenshot(result.getMethod().getMethodName(), driver);
-            extentTest.get().addScreenCaptureFromPath(screenshotPath, result.getMethod().getMethodName());
-            
-            //
-            String sessionId = ((RemoteWebDriver) driver).getSessionId().toString();
-            String lambdaTestURL = "https://appautomation.lambdatest.com/test?testID=" + sessionId;
-            System.out.println("LambdaTest Report URL: " + lambdaTestURL);
-            extentTest.get().log(Status.INFO, "🔗 <a href='" + lambdaTestURL + "' target='_blank'>LambdaTest Report</a>");
+        if (driver != null) {
+            try {
+                String screenshotPath = getScreenshot(result.getMethod().getMethodName(), driver);
+                extentTest.get().addScreenCaptureFromPath(screenshotPath, "📸 Screenshot on Failure");
+            } catch (IOException e) {
+                extentTest.get().log(Status.WARNING, "⚠️ Screenshot could not be taken.");
+            }
 
-        } catch (IOException e) {
-            e.printStackTrace();
+            try {
+                String sessionId = ((RemoteWebDriver) driver).getSessionId().toString();
+                String videoLink = "https://appautomation.lambdatest.com/test?testID=" + sessionId;
+                extentTest.get().log(Status.INFO, "🎥 <a href='" + videoLink + "' target='_blank'>Watch Test Video</a>");
+            } catch (Exception e) {
+                extentTest.get().log(Status.WARNING, "⚠️ Could not attach LambdaTest video link.");
+            }
         }
     }
 
     @Override
+    public void onTestSkipped(ITestResult result) {
+        extentTest.get().log(Status.SKIP, "⏭️ Test Skipped: " + result.getThrowable());
+    }
+
+    @Override
     public void onFinish(ITestContext context) {
-        extent.flush(); // important to generate the report
+        extent.flush(); // Must flush to generate report
     }
 }

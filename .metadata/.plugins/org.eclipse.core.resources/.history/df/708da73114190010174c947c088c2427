@@ -1,0 +1,128 @@
+package pagevalidation;
+
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+
+import basetest.Abstract;
+import io.appium.java_client.android.AndroidDriver;
+
+public class ArticleStatus extends Abstract {
+    AndroidDriver driver;
+
+    public ArticleStatus(AndroidDriver driver) {
+        super(driver);
+        this.driver = driver;
+    }
+
+    Set<String> openedKeys = new HashSet<>();
+
+    public void validateArticlesOnHomeWebView() throws Exception {
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        Thread.sleep(2000);
+        int maxScrolls = 25;
+        int scrollCount = 0;
+
+        String todayDate = getTodayFormattedInHindi();
+
+        // Switch to WebView_chrome (assuming articles are inside this WebView on home)
+        boolean webViewSwitched = false;
+        for (String context : driver.getContextHandles()) {
+            if (context.toLowerCase().contains("webview_chrome")) {
+                driver.context(context);
+                System.out.println("✅ Switched to context: " + context);
+                webViewSwitched = true;
+                break;
+            }
+        }
+
+        if (!webViewSwitched) {
+            System.out.println("❌ WebView_chrome not found on home screen.");
+            return;
+        }
+
+        while (scrollCount < maxScrolls) {
+            boolean foundNewArticle = false;
+            boolean reachedOldDate = false;
+
+            List<WebElement> cards = driver.findElements(By.xpath("//a[contains(@href, '/news/')]"));
+
+            for (WebElement card : cards) {
+                String url = "";
+                String title = "";
+                String date = "";
+
+                try {
+                    url = card.getAttribute("href");
+                    title = card.getText().trim();
+                    WebElement parent = card.findElement(By.xpath(".."));
+                    date = parent.getText().trim(); // Adjust if there's a better way to locate date
+
+                    if (!date.contains(todayDate)) {
+                        System.out.println("🚨 Found old date article: " + date);
+                        reachedOldDate = true;
+                        break;
+                    }
+
+                    String key = title + "|" + url;
+
+                    if (!openedKeys.contains(key) && title.length() > 0) {
+                        openedKeys.add(key);
+                        foundNewArticle = true;
+
+                        System.out.println("🔍 Checking: " + title);
+                        System.out.println("🔗 URL: " + url);
+                        int status = getUrlStatus(url);
+                        System.out.println("✅ Status Code: " + status);
+                    }
+
+                } catch (Exception e) {
+                    System.out.println("⚠️ Skipped a card due to error: " + e.getMessage());
+                    continue;
+                }
+            }
+
+            if (reachedOldDate) {
+                System.out.println("🎉 All today's articles processed.");
+                break;
+            }
+
+            if (!foundNewArticle) {
+                System.out.println("📜 Scrolling to load more articles...");
+                swipeUp(); // This must be able to scroll the WebView
+                Thread.sleep(3000);
+                scrollCount++;
+            }
+        }
+
+        // Return to native context
+        driver.context("NATIVE_APP");
+    }
+
+    private String getTodayFormattedInHindi() {
+        Locale hindi = new Locale("hi", "IN");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM", hindi);
+        return formatter.format(new Date());
+    }
+
+    private int getUrlStatus(String url) {
+        try {
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+            connection.setRequestMethod("GET");
+            connection.connect();
+            return connection.getResponseCode();
+        } catch (Exception e) {
+            System.out.println("❌ URL check failed: " + e.getMessage());
+            return -1;
+        }
+    }
+}

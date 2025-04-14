@@ -1,0 +1,248 @@
+package pagevalidation;
+
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Point;
+import org.openqa.selenium.WebElement;
+
+import basetest.Abstract;
+import io.appium.java_client.android.AndroidDriver;
+
+public class ArticleStatus extends Abstract {
+    AndroidDriver driver;
+    Set<String> openedKeys = new HashSet<>();
+    Set<String> processedUrls = new HashSet<>();
+
+    public ArticleStatus(AndroidDriver driver) {
+        super(driver);
+        this.driver = driver;
+    }
+
+    public void validateArticlesUntilTodayEnds() throws Exception {
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        Thread.sleep(2000);
+        int maxScrolls = 25;
+        int scrollCount = 0;
+        String todayDate = getTodayFormattedInHindi();
+
+        while (scrollCount < maxScrolls) {
+            boolean foundNewArticle = false;
+            boolean reachedOldDate = false;
+
+            // Get all article title elements that are child of valid cards
+            List<WebElement> titleElements = driver.findElements(By.xpath(
+                "//android.widget.ScrollView//android.view.ViewGroup" +
+                "[.//android.widget.TextView[2][contains(translate(@text, '•', ''), '" + todayDate + "')]]" +
+                "//android.widget.TextView[1]"
+            ));
+
+            for (WebElement titleElement : titleElements) {
+                try {
+                    String title = titleElement.getText().trim();
+                    if (title.isEmpty()) continue;
+
+                    // Get parent card for additional checks
+                    WebElement card = (WebElement) titleElement.findElement(By.xpath("./../.."));
+                    
+                    // Skip video/shorts cards
+                    if (isVideoCard(card)) {
+                        System.out.println("🎥 Skipping video/shorts card: " + title);
+                        continue;
+                    }
+
+                    // Verify date is today's
+                    String date = card.findElement(By.xpath(".//android.widget.TextView[2]"))
+                                     .getText().replace("•", "").trim();
+                    if (!date.contains(todayDate)) {
+                        System.out.println("🚨 Reached older article: " + date);
+                        reachedOldDate = true;
+                        break;
+                    }
+
+                    // Skip if already processed
+                    String key = title + "|" + date;
+                    if (openedKeys.contains(key)) {
+                        continue;
+                    }
+
+                    // Critical: Check if FULL title is visible and clickable
+                    if (!isElementFullyVisibleAndClickable(titleElement)) {
+                        System.out.println("⏩ Skipping - Title not fully visible: " + title);
+                        continue;
+                    }
+
+                    openedKeys.add(key);
+                    foundNewArticle = true;
+                    System.out.println("🖱️ Clicking: " + title);
+
+                    // Click the title text directly
+                    titleElement.click();
+                    Thread.sleep(3000);
+
+                    // Handle any popups
+                    handleConsentPopup();
+
+                    // Process the article URL
+                    processArticleUrl();
+
+                    // Return to article list
+                    driver.navigate().back();
+                    Thread.sleep(2000);
+                    break;
+
+                } catch (Exception e) {
+                    System.out.println("❌ Error processing card: " + e.getMessage());
+                    continue;
+                }
+            }
+
+            if (reachedOldDate) break;
+            
+            if (!foundNewArticle) {
+                System.out.println("⬇️ Scrolling for more articles...");
+                swipeUp();
+                Thread.sleep(3000);
+                scrollCount++;
+            }
+        }
+        System.out.println("✅ Finished processing today's articles");
+    }
+
+    private boolean isVideoCard(WebElement card) {
+        try {
+            // Check for video indicators in Hindi and English
+            List<WebElement> videoIndicators = card.findElements(By.xpath(
+                ".//*[contains(translate(@text, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'shorts') or " +
+                "contains(translate(@text, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'video') or " +
+                "contains(@text, 'शॉर्ट') or contains(@text, 'वीडियो')]"
+            ));
+            
+            // Check for duration pattern (e.g. 1:23)
+            boolean hasDuration = card.findElements(By.xpath(
+                ".//*[matches(@text, '^[0-9]{1,2}:[0-9]{2}$')]"
+            )).size() > 0;
+            
+            return !videoIndicators.isEmpty() || hasDuration;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private boolean isElementFullyVisibleAndClickable(WebElement element) {
+        try {
+            if (!element.isDisplayed()) return false;
+            
+            // Get element location and size
+            Point location = element.getLocation();
+            Dimension size = element.getSize();
+            
+            // Get screen dimensions
+            Dimension screenSize = driver.manage().window().getSize();
+            int screenWidth = screenSize.getWidth();
+            int screenHeight = screenSize.getHeight();
+            
+            // Calculate visible area
+            boolean isVisible = location.x >= 0 &&
+                              (location.x + size.width) <= screenWidth &&
+                              location.y >= 0 &&
+                              (location.y + size.height) <= screenHeight;
+            
+            // Additional check for clickable area
+            if (isVisible) {
+                int centerX = location.x + (size.width / 2);
+                int centerY = location.y + (size.height / 2);
+                return centerX > 0 && centerX < screenWidth &&
+                       centerY > 0 && centerY < screenHeight;
+            }
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private void handleConsentPopup() {
+        try {
+            WebElement consentButton = driver.findElement(By.xpath("//*[contains(@text, 'Consent')]"));
+            if (consentButton.isDisplayed()) {
+                consentButton.click();
+                System.out.println("✅ Clicked consent button");
+                Thread.sleep(3000);
+            }
+        } catch (Exception e) {
+            // No consent popup found
+        }
+    }
+
+    private void processArticleUrl() {
+        try {
+            // Switch to WebView context
+            String targetContext = driver.getContextHandles().stream()
+                .filter(c -> c.toLowerCase().contains("webview"))
+                .findFirst()
+                .orElse(null);
+                
+            if (targetContext == null) {
+                System.out.println("⚠️ No WebView context found");
+                return;
+            }
+            
+            driver.context(targetContext);
+            System.out.println("🌐 Switched to WebView context");
+            
+            Thread.sleep(2000); // Wait for WebView to load
+            
+            String url = driver.getCurrentUrl();
+            if (url == null || url.isEmpty() || url.startsWith("about:blank")) {
+                System.out.println("❌ Invalid URL detected");
+                return;
+            }
+            
+            // Check for duplicate URLs
+            if (processedUrls.contains(url)) {
+                System.out.println("♻️ Duplicate URL skipped: " + url);
+                return;
+            }
+            
+            processedUrls.add(url);
+            System.out.println("🔗 New URL found: " + url);
+            
+            // Check URL status with timeout
+            int status = getUrlStatus(url);
+            System.out.println("⚡ HTTP Status: " + status);
+            
+        } catch (Exception e) {
+            System.out.println("❌ URL processing error: " + e.getMessage());
+        } finally {
+            // Always return to native context
+            driver.context("NATIVE_APP");
+        }
+    }
+
+    private String getTodayFormattedInHindi() {
+        Locale hindi = new Locale("hi", "IN");
+        return new SimpleDateFormat("dd MMMM", hindi).format(new Date());
+    }
+
+    private int getUrlStatus(String url) {
+        try {
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+            connection.setRequestMethod("HEAD");
+            connection.setConnectTimeout(3000);
+            connection.setReadTimeout(3000);
+            return connection.getResponseCode();
+        } catch (Exception e) {
+            System.out.println("❌ URL check failed: " + e.getMessage());
+            return -1;
+        }
+    }
+}

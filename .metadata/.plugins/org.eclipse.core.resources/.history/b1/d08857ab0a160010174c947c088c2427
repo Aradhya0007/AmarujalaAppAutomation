@@ -1,0 +1,85 @@
+package login;
+
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+import org.testng.Assert;
+
+import Signup.signupflowmakenewaccount;
+import basetest.Abstract;
+import io.appium.java_client.android.AndroidDriver;
+
+public class LoginOtpFlow extends Abstract {
+	AndroidDriver driver;
+	public LoginOtpFlow(AndroidDriver driver) {
+		super(driver);
+		// TODO Auto-generated constructor stub
+		this.driver=driver;
+		PageFactory.initElements(driver, this);
+	}
+	//enter mobile number 
+	@FindBy(xpath="//android.widget.EditText")
+	WebElement EnterMobileNumberLogin;
+	
+	//click on otp genrate btn
+	@FindBy(xpath="//android.view.ViewGroup[@content-desc='ओटीपी जनरेट करें']")
+	WebElement GenrateOtpLogin;
+	
+	//validation msg btn
+	@FindBy(xpath="//android.widget.TextView[@text=\"कृपया अपना 10 अंकों का मोबाइल नंबर दर्ज करें\"]")
+	WebElement MsgBtnLogin;
+	
+	//change number 
+		@FindBy(xpath="//android.widget.TextView[@text='मोबाइल नंबर बदलें']")
+		WebElement ChangeNumberLogin;
+	
+		
+		//enter opt container
+		@FindBy(xpath="(//android.widget.TextView[@text='-'])[1]")
+		WebElement EnterotpLogin;
+		
+		//otp submit btn
+		@FindBy(xpath="//android.view.ViewGroup[@content-desc=\"ओटीपी सत्यापित करें\"]")
+		WebElement SubmitOtpLogin;
+	
+	
+		public void otploginflow() throws InterruptedException {
+		    // blank number
+		    click(GenrateOtpLogin, "Generate OTP Button (Blank Field)");
+		    assertDisplayed(MsgBtnLogin, "Validation Message for Blank Mobile Number");
+
+		    // invalid number less than 10 digits
+		    Thread.sleep(2000);
+		    sendKeys(EnterMobileNumberLogin, "123456789", "Mobile Number Field (9 digits)");
+		    click(GenrateOtpLogin, "Generate OTP Button (Invalid Number)");
+		    assertDisplayed(MsgBtnLogin, "Validation Message for Invalid Mobile Number");
+		    clear(EnterMobileNumberLogin, "Mobile Number Field");
+
+		    // Correct number
+		    sendKeys(EnterMobileNumberLogin, "1234567899", "Mobile Number Field (Valid)");
+		    click(GenrateOtpLogin, "Generate OTP Button (Valid Number)");
+
+		    // OTP validation
+		    signupflowmakenewaccount otpcheck = new signupflowmakenewaccount(driver);
+		    otpcheck.OtpValidationField("login");
+
+		    // number change button click
+		    click(ChangeNumberLogin, "Change Mobile Number Button");
+
+		    // Error case skipped (as commented in original code)
+		    // GenrateOtpLogin.click();
+
+		    // valid flow
+		    clear(EnterMobileNumberLogin, "Mobile Number Field");
+		    sendKeys(EnterMobileNumberLogin, "1234567888", "Mobile Number Field (Valid Final)");
+		    click(GenrateOtpLogin, "Generate OTP Button (Final Valid Number)");
+		    click(EnterotpLogin, "OTP Entry Field");
+		    enterOtpUsingKeyboard("123456");
+		    driver.hideKeyboard();
+		    click(SubmitOtpLogin, "Submit OTP Button");
+
+		    // validate afterward (no element here to validate per your comment)
+		}
+
+
+}

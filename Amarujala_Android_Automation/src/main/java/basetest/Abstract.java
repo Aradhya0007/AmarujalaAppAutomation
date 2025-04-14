@@ -16,6 +16,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
 
 import Logout.logout;
 import io.appium.java_client.AppiumBy;
@@ -256,5 +257,52 @@ public class Abstract {
 	}
 	
 
+
+
+//click senkey clear asseriton
+
+public void click(WebElement element, String elementName) {
+    try {
+        element.click();
+        ExtentLogger.logPass("Clicked on: " + elementName);
+    } catch (Exception e) {
+        ExtentLogger.logFail("Failed to click on: " + elementName);
+        ExtentLogger.logException(e, driver);
+        throw e;
+    }
+}
+
+public void sendKeys(WebElement element, String value, String elementName) {
+    try {
+        element.sendKeys(value);
+        ExtentLogger.logPass("Entered '" + value + "' in: " + elementName);
+    } catch (Exception e) {
+        ExtentLogger.logFail("Failed to sendKeys in: " + elementName);
+        ExtentLogger.logException(e, driver);
+        throw e;
+    }
+}
+
+public void clear(WebElement element, String elementName) {
+    try {
+        element.clear();
+        ExtentLogger.logPass("Cleared: " + elementName);
+    } catch (Exception e) {
+        ExtentLogger.logFail("Failed to clear: " + elementName);
+        ExtentLogger.logException(e, driver);
+        throw e;
+    }
+}
+
+public void assertDisplayed(WebElement element, String elementName) {
+    try {
+        Assert.assertTrue(element.isDisplayed(), elementName + " is not displayed.");
+        ExtentLogger.logPass(elementName + " is displayed.");
+    } catch (AssertionError | Exception e) {
+        ExtentLogger.logFail("Assertion Failed: " + elementName + " is not displayed.");
+        ExtentLogger.logException(e, driver);
+        throw e;
+    }
+}
 }
 

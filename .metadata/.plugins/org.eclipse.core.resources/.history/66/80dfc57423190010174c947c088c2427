@@ -1,0 +1,168 @@
+package pagevalidation;
+
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+
+import basetest.Abstract;
+import io.appium.java_client.android.AndroidDriver;
+
+public class ArticleStatus extends Abstract {
+    AndroidDriver driver;
+
+    public ArticleStatus(AndroidDriver driver) {
+        super(driver);
+        this.driver = driver;
+    }
+
+    Set<String> openedKeys = new HashSet<>(); // To track opened articles
+
+    public void validateArticlesUntilTodayEnds() throws Exception {
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        Thread.sleep(2000);
+        int maxScrolls = 25;
+        int scrollCount = 0;
+
+        String todayDate = getTodayFormattedInHindi();
+
+        while (scrollCount < maxScrolls) {
+            boolean foundNewArticle = false;
+            boolean reachedOldDate = false;
+
+            // Dynamically fetch all article cards on the current screen
+            List<WebElement> cards = driver.findElements(By.xpath("//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup"));
+
+            for (WebElement card : cards) {
+
+                // ❌ Skip if it contains unwanted nested elements (ads/widgets etc.)
+                boolean hasShorts = !card.findElements(By.xpath(".//*[@text='शॉर्ट वीडियोज']")).isEmpty();
+                boolean hasVideos = !card.findElements(By.xpath(".//*[@text='वीडियो']")).isEmpty();
+                boolean hasSvgStructure = !card.findElements(By.xpath(".//com.horcrux.svg.SvgView/com.horcrux.svg.GroupView/com.horcrux.svg.GroupView")).isEmpty();
+
+                if (hasShorts || hasVideos || hasSvgStructure) {
+                    System.out.println("🎥 Skipping non-article card");
+                    continue;
+                }
+
+                // ✅ Get title and date inside this card
+                List<WebElement> titleElements = card.findElements(By.xpath(".//android.widget.TextView[1]"));
+                List<WebElement> dateElements = card.findElements(By.xpath(".//android.widget.TextView[2]"));
+
+                if (titleElements.isEmpty() || dateElements.isEmpty()) continue;
+
+                String title = titleElements.get(0).getText().trim();
+                String date = dateElements.get(0).getText().replace("•", "").trim();
+
+                if (!date.contains(todayDate)) {
+                    System.out.println("🚨 Reached older article: " + date);
+                    reachedOldDate = true;
+                    break;
+                }
+
+                String key = title.replaceAll("\\s+", " ") + "|" + date;
+                if (openedKeys.contains(key) || title.isEmpty()) continue;
+
+                openedKeys.add(key);
+                foundNewArticle = true;
+                System.out.println("🔟 Opening: " + title + " (" + date + ")");
+
+                try {
+                    card.click();
+                } catch (Exception e) {
+                    System.out.println("❌ Click failed: " + e.getMessage());
+                    continue;
+                }
+
+                Thread.sleep(3000);
+
+                // Handle Consent popup if appears
+                try {
+                    WebElement consentButton = driver.findElement(By.xpath("//*[@text='Consent']"));
+                    if (consentButton.isDisplayed()) {
+                        Thread.sleep(1000);
+                        consentButton.click();
+                        System.out.println("✅ Clicked on Consent button.");
+                        Thread.sleep(7000);
+                    }
+                } catch (Exception e) {
+                    System.out.println("ℹ️ Consent button not found, skipping.");
+                }
+
+                // Print all available contexts
+                System.out.println("🌐 Available contexts after article open:");
+                for (String context : driver.getContextHandles()) {
+                    System.out.println(" - " + context);
+                }
+
+                // Switch to correct WebView
+                boolean webviewFound = false;
+                for (String context : driver.getContextHandles()) {
+                    if (context.toLowerCase().contains("webview_com.org.amarujala.news")) {
+                        driver.context(context);
+                        System.out.println("🔄 Switched to context: " + context);
+                        webviewFound = true;
+                        break;
+                    }
+                }
+
+                if (webviewFound) {
+                    try {
+                        Thread.sleep(2000); // wait for webview content to load
+                        String url = driver.getCurrentUrl();
+                        System.out.println("🔗 URL: " + url);
+                        int status = getUrlStatus(url);
+                        System.out.println("✅ Status Code: " + status);
+                    } catch (Exception e) {
+                        System.out.println("❌ Failed to get URL: " + e.getMessage());
+                    } finally {
+                        driver.context("NATIVE_APP");
+                    }
+                } else {
+                    System.out.println("⚠️ WebView not found.");
+                }
+
+                Thread.sleep(2000);
+                driver.navigate().back();
+                Thread.sleep(2000);
+                break;
+            }
+
+            if (reachedOldDate) {
+                System.out.println("🎉 All today's articles are processed. Exiting.");
+                break;
+            }
+
+            if (!foundNewArticle) {
+                System.out.println("📄 No new article on screen. Scrolling...");
+                swipeUp();
+                Thread.sleep(3000);
+                scrollCount++;
+            }
+        }
+    }
+
+    private String getTodayFormattedInHindi() {
+        Locale hindi = new Locale("hi", "IN");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM", hindi); // e.g. 14 अप्रैल
+        return formatter.format(new Date());
+    }
+
+    private int getUrlStatus(String url) {
+        try {
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+            return connection.getResponseCode();
+        } catch (Exception e) {
+            System.out.println("❌ URL check failed: " + e.getMessage());
+            return -1;
+        }
+    }
+}

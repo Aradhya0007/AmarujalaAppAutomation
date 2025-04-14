@@ -6,9 +6,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testng.Assert;
 
 import Logout.logout;
 import basetest.Abstract;
@@ -20,11 +18,9 @@ public class profiledetailsignup extends Abstract {
 	 
 	public profiledetailsignup(AndroidDriver driver) {
 		super(driver);
-		this.driver=driver;
+		this.driver = driver;
 		PageFactory.initElements(driver, this);  
 	}
-	
-	
 	
 	//Form locator
 	
@@ -38,7 +34,6 @@ public class profiledetailsignup extends Abstract {
 	
 
 	//Calendar Ok btn
-	
 	@FindBy(xpath = "//android.widget.Button[@resource-id=\"android:id/button1\"]")
 	WebElement CalendarOkBtnSignup;
 	
@@ -90,9 +85,7 @@ public class profiledetailsignup extends Abstract {
 	
 	
 	
-	
 	//validation for name 
-	
 	@FindBy(xpath = "//android.widget.TextView[@text=\"मान्य नाम दर्ज करें\"]")
 	WebElement ValidationNameMSgSignup;
 	
@@ -121,40 +114,41 @@ public class profiledetailsignup extends Abstract {
 	public void ProfilevalidationSignup() throws InterruptedException {
 		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 		//empty form submit
-		GoAheadSignup.click();
-		Assert.assertTrue( ValidationDobMsgSignup.isDisplayed(),"Dob detail in profile form after signup validation msg not comming ");
-		Assert.assertTrue( ValidationGenderMsgSignup.isDisplayed(), "Gender detail in profile form after signup validation msg not comming");
-		Assert.assertTrue( ValidationNameMSgSignup.isDisplayed(),"Name validation msg is not coming in profile form");
-		Assert.assertTrue( ValidationPasswordSignup.isDisplayed(),"Password Validation msg in profile is not coming");
+		click(GoAheadSignup, "Go Ahead Button");
+		assertDisplayed(ValidationDobMsgSignup, "DOB validation");
+		assertDisplayed(ValidationGenderMsgSignup, "Gender validation");
+		assertDisplayed(ValidationNameMSgSignup, "Name validation");
+		assertDisplayed(ValidationPasswordSignup, "Password validation");
 		scrollUntilElementVisible( By.xpath("//android.view.ViewGroup[@content-desc='आगे बढ़ें']") , 2,"up");
-		Assert.assertTrue( ValidationTermsConditionSignup.isDisplayed(),"Validation msg is not comming when we did not ticked the terms and codition in profile form page");
+		assertDisplayed(ValidationTermsConditionSignup, "Terms validation");
 		DobAndGenderValidation();
 	}
+	
 	public void DobAndGenderValidation() throws InterruptedException {
 		scrollUntilElementVisible(By.xpath("//android.widget.EditText[@text=\"पूरा नाम*\"]") , 2,"down");
-		ProfileNameSignup.sendKeys("TestAutomation1");
-		PasswordSignup.sendKeys("Test123@");
-		ViewPasswordSignup.click();
+		sendKeys(ProfileNameSignup, "TestAutomation1", "Profile Name");
+		sendKeys(PasswordSignup, "Test123@", "Password Field");
+		click(ViewPasswordSignup, "View Password");
 		driver.hideKeyboard();
-		TermsTickerSignup.click();
-		ServicesTickerSignup.click();
-		GoAheadSignup.click();
-		Assert.assertTrue( ValidationDobMsgSignup.isDisplayed(),"Dob detail in profile form after signup validation msg not comming ");
-		Assert.assertTrue( ValidationGenderMsgSignup.isDisplayed(), "Gender detail in profile form after signup validation msg not comming");
+		click(TermsTickerSignup, "Terms Ticker");
+		click(ServicesTickerSignup, "Services Ticker");
+		click(GoAheadSignup, "Go Ahead Button");
+		assertDisplayed(ValidationDobMsgSignup, "DOB validation");
+		assertDisplayed(ValidationGenderMsgSignup, "Gender validation");
 		ProfileNameValidationProfile();
 	}
 	
 	public void ProfileNameValidationProfile() throws InterruptedException {
-		DOBSignup.click();
-		CalendarOkBtnSignup.click();
-		
-		GenderSignup.click();
+		click(DOBSignup, "DOB Field");
+		click(CalendarOkBtnSignup, "Calendar OK Button");
+		click(GenderSignup, "Gender Option");
+
 ////////////////////Problem dev side/////////////////
-		//ProfileNameSignup.clear();
-		//GoAheadSignup.click();
-		//Assert.assertTrue( ValidationNameMSgSignup.isDisplayed(),"Name validation msg is not coming in profile form");
-		//ProfileNameSignup.sendKeys("TestAutomation1");
-		
+//		clear(ProfileNameSignup, "Profile Name Field");
+//		click(GoAheadSignup, "Go Ahead Button");
+//		assertDisplayed(ValidationNameMSgSignup, "Name validation");
+//		sendKeys(ProfileNameSignup, "TestAutomation1", "Profile Name");
+
 		PasswordValidationProfile();
 		
 	}
@@ -163,52 +157,51 @@ public class profiledetailsignup extends Abstract {
 		
 		//clear case
 		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
-		PasswordSignup.clear();
+		clear(PasswordSignup, "Password Field");
 		scrollUntilElementVisible( By.xpath("//android.view.ViewGroup[@content-desc='आगे बढ़ें']") , 2,"up");
-		GoAheadSignup.click();
-		Assert.assertTrue( ValidationPasswordSignup.isDisplayed(),"Password Validation msg in profile is not coming");
+		click(GoAheadSignup, "Go Ahead Button");
+		assertDisplayed(ValidationPasswordSignup, "Password validation");
 		
 		
 		//less then 8 character
-		PasswordSignup.sendKeys("Ajaj12@");
-		GoAheadSignup.click();
-		Assert.assertTrue( ValidationPasswordSignup.isDisplayed(),"Password Validation form msg not coming");
-		PasswordSignup.clear();
+		sendKeys(PasswordSignup, "Ajaj12@", "Password Field");
+		click(GoAheadSignup, "Go Ahead Button");
+		assertDisplayed(ValidationPasswordSignup, "Password validation");
+		clear(PasswordSignup, "Password Field");
 		
 		
 		//No uppercase
-		PasswordSignup.sendKeys("ajaj123@");
-		GoAheadSignup.click();
-		Assert.assertTrue( ValidationPasswordSignup.isDisplayed(),"Password Validation form msg not coming");
-		PasswordSignup.clear();
+		sendKeys(PasswordSignup, "ajaj123@", "Password Field");
+		click(GoAheadSignup, "Go Ahead Button");
+		assertDisplayed(ValidationPasswordSignup, "Password validation");
+		clear(PasswordSignup, "Password Field");
 		
 		//No special char case
-		PasswordSignup.sendKeys("ajaj1234");
-		GoAheadSignup.click();
-		Assert.assertTrue( ValidationPasswordSignup.isDisplayed(),"Password Validation form msg not coming");
-		PasswordSignup.clear();
+		sendKeys(PasswordSignup, "ajaj1234", "Password Field");
+		click(GoAheadSignup, "Go Ahead Button");
+		assertDisplayed(ValidationPasswordSignup, "Password validation");
+		clear(PasswordSignup, "Password Field");
 		
 		//No lower Case
-		PasswordSignup.sendKeys("AJAJAJ1234");
-		GoAheadSignup.click();
-		Assert.assertTrue( ValidationPasswordSignup.isDisplayed(),"Password Validation form msg not coming");
-		PasswordSignup.clear();
+		sendKeys(PasswordSignup, "AJAJAJ1234", "Password Field");
+		click(GoAheadSignup, "Go Ahead Button");
+		assertDisplayed(ValidationPasswordSignup, "Password validation");
+		clear(PasswordSignup, "Password Field");
 		
 		//No Number 
-		PasswordSignup.sendKeys("AJAJAJ1234");
-		GoAheadSignup.click();
-		Assert.assertTrue( ValidationPasswordSignup.isDisplayed(),"Password Validation form msg not coming");
-		PasswordSignup.clear();
+		sendKeys(PasswordSignup, "AJAJAJ1234", "Password Field");
+		click(GoAheadSignup, "Go Ahead Button");
+		assertDisplayed(ValidationPasswordSignup, "Password validation");
+		clear(PasswordSignup, "Password Field");
 		
 		//No char
-		PasswordSignup.sendKeys("12345@129");
-		GoAheadSignup.click();
-		Assert.assertTrue( ValidationPasswordSignup.isDisplayed(),"Password Validation form msg not coming");
-		PasswordSignup.clear();
+		sendKeys(PasswordSignup, "12345@129", "Password Field");
+		click(GoAheadSignup, "Go Ahead Button");
+		assertDisplayed(ValidationPasswordSignup, "Password validation");
+		clear(PasswordSignup, "Password Field");
 		
 		//valid pass
-		PasswordSignup.sendKeys("Test123@");
-		
+		sendKeys(PasswordSignup, "Test123@", "Password Field");
 		
 		TickerValidationPRofile();
 		
@@ -217,25 +210,25 @@ public class profiledetailsignup extends Abstract {
 	public void TickerValidationPRofile() throws InterruptedException {
 		
 		//Both are not ticked
-		TermsTickerSignup.click();
-		ServicesTickerSignup.click();
-		GoAheadSignup.click();
-		Assert.assertTrue( ValidationTermsConditionSignup.isDisplayed(),"Validation msg is not comming when we did not ticked the terms and codition in profile form page");
+		click(TermsTickerSignup, "Terms Ticker");
+		click(ServicesTickerSignup, "Services Ticker");
+		click(GoAheadSignup, "Go Ahead Button");
+		assertDisplayed(ValidationTermsConditionSignup, "Terms validation");
 		
 		//Terms ticker is ticked only
-		TermsTickerSignup.click();
-		GoAheadSignup.click();
-		Assert.assertTrue( ValidationTermsConditionSignup.isDisplayed(),"Validation msg is not comming when we did not ticked the terms and codition in profile form page");
+		click(TermsTickerSignup, "Terms Ticker");
+		click(GoAheadSignup, "Go Ahead Button");
+		assertDisplayed(ValidationTermsConditionSignup, "Terms validation");
 		
 		//Service ticker is ticked only
-		TermsTickerSignup.click();//already ticked i unticked
-		ServicesTickerSignup.click();
-		GoAheadSignup.click();
-		Assert.assertTrue( ValidationTermsConditionSignup.isDisplayed(),"Validation msg is not comming when we did not ticked the terms and codition in profile form page");
-		TermsTickerSignup.click();
+		click(TermsTickerSignup, "Terms Ticker");
+		click(ServicesTickerSignup, "Services Ticker");
+		click(GoAheadSignup, "Go Ahead Button");
+		assertDisplayed(ValidationTermsConditionSignup, "Terms validation");
+		click(TermsTickerSignup, "Terms Ticker");
 		
 		//all validation done
-		GoAheadSignup.click();
+		click(GoAheadSignup, "Go Ahead Button");
 		
 		LocationSelect();
 	}
@@ -245,26 +238,23 @@ public class profiledetailsignup extends Abstract {
 		
 		//wrong location
 		Thread.sleep(4000);
-		SearchLocation.click();
-		SearchLocation.sendKeys("delhihhdhdhd");
-		Assert.assertTrue(WrongLocatioSelectValidationMsg.isDisplayed(), "if wrong city is search no msg is displayed");
+		click(SearchLocation, "Search Location Field");
+		sendKeys(SearchLocation, "delhihhdhdhd", "Search Location");
+		assertDisplayed(WrongLocatioSelectValidationMsg, "Wrong Location Validation");
 		//Correct Loaction
-		SearchLocation.clear();
-		SearchLocation.sendKeys("Delhi");
+		clear(SearchLocation, "Search Location Field");
+		sendKeys(SearchLocation, "Delhi", "Search Location");
 		driver.hideKeyboard();
-		FollowLocation.click();
-		GoAheadLocation.click();
+		click(FollowLocation, "Follow Location");
+		click(GoAheadLocation, "Go Ahead Button Location");
 		IntrestSelect();
 		
 	}
 	
 	public void IntrestSelect() throws InterruptedException {
 		Thread.sleep(2000);
-		DeshIntrest.click();
-		GoAheadLocation.click();
-		
+		click(DeshIntrest, "Desh Interest");
+		click(GoAheadLocation, "Go Ahead Button Location");
 		
 	}
-	
-	
 }

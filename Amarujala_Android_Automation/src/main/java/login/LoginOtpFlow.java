@@ -10,7 +10,7 @@ import basetest.Abstract;
 import io.appium.java_client.android.AndroidDriver;
 
 public class LoginOtpFlow extends Abstract {
-	AndroidDriver driver;
+	public AndroidDriver driver;
 	public LoginOtpFlow(AndroidDriver driver) {
 		super(driver);
 		// TODO Auto-generated constructor stub
@@ -43,41 +43,43 @@ public class LoginOtpFlow extends Abstract {
 		WebElement SubmitOtpLogin;
 	
 	
-	public void otploginflow() throws InterruptedException {
-		//blank number
-		GenrateOtpLogin.click();
-		Assert.assertTrue(MsgBtnLogin.isDisplayed(),"validation msg is not coming in case of invalid otp");
-		//invalid number less then 10 digit
-		Thread.sleep(2000);
-		EnterMobileNumberLogin.sendKeys("123456789");
-		GenrateOtpLogin.click();
-		Assert.assertTrue(MsgBtnLogin.isDisplayed(),"validation msg is not coming in case of invalid otp");
-		EnterMobileNumberLogin.clear();
-		//Correct number 
-		EnterMobileNumberLogin.sendKeys("1234567899");
-		GenrateOtpLogin.click(); 
-		//otp validation 
-		signupflowmakenewaccount otpcheck=new signupflowmakenewaccount(driver);
-		otpcheck.OtpValidationField("login");
-		//number change button click
-		ChangeNumberLogin.click();
-		
-		//need to work error................the number is blocked and we click again to genrate otp it is is giving 505
-		//GenrateOtpLogin.click();
-		
-		
-		//valid flow 
-		
-		EnterMobileNumberLogin.clear();
-		EnterMobileNumberLogin.sendKeys("1234567888");
-		GenrateOtpLogin.click();
-		EnterotpLogin.click();
-		enterOtpUsingKeyboard("123456");
-		driver.hideKeyboard();
-		SubmitOtpLogin.click();
-		
-		//validate after word
-		
-	}
+		public void otploginflow() throws InterruptedException {
+		    // blank number
+		    click(GenrateOtpLogin, "Generate OTP Button (Blank Field)");
+		    assertDisplayed(MsgBtnLogin, "Validation Message for Blank Mobile Number");
+
+		    // invalid number less than 10 digits
+		    Thread.sleep(2000);
+		    sendKeys(EnterMobileNumberLogin, "123456789", "Mobile Number Field (9 digits)");
+		    click(GenrateOtpLogin, "Generate OTP Button (Invalid Number)");
+		    assertDisplayed(MsgBtnLogin, "Validation Message for Invalid Mobile Number");
+		    clear(EnterMobileNumberLogin, "Mobile Number Field");
+
+		    // Correct number
+		    sendKeys(EnterMobileNumberLogin, "1234567899", "Mobile Number Field (Valid)");
+		    click(GenrateOtpLogin, "Generate OTP Button (Valid Number)");
+
+		    // OTP validation
+		    signupflowmakenewaccount otpcheck = new signupflowmakenewaccount(driver);
+		    otpcheck.OtpValidationField("login");
+
+		    // number change button click
+		    click(ChangeNumberLogin, "Change Mobile Number Button");
+
+		    // Error case skipped (as commented in original code)
+		    // GenrateOtpLogin.click();
+
+		    // valid flow
+		    clear(EnterMobileNumberLogin, "Mobile Number Field");
+		    sendKeys(EnterMobileNumberLogin, "1234567888", "Mobile Number Field (Valid Final)");
+		    click(GenrateOtpLogin, "Generate OTP Button (Final Valid Number)");
+		    click(EnterotpLogin, "OTP Entry Field");
+		    enterOtpUsingKeyboard("123456");
+		    driver.hideKeyboard();
+		    click(SubmitOtpLogin, "Submit OTP Button");
+
+		    // validate afterward (no element here to validate per your comment)
+		}
+
 
 }
