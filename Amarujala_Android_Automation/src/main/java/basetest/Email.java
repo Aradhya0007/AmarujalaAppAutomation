@@ -1,0 +1,91 @@
+package basetest;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Date;
+import java.util.Properties;
+
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+
+public class Email {
+
+    public static void sendReport(String toEmail, String subject, String reportMessage, String reportFileName) throws IOException {
+        // Configuration
+        String host = "smtp.gmail.com";
+        String port = "587";
+        final String userName = "aradhyajoshi00007@gmail.com";  // your email
+        final String password = "peuxvfejmueaszkh";        // App password (not your regular password)
+
+        // Report path (make sure this file exists after test run)
+        String attachFilePath =System.getProperty("user.dir") + "/reports/index.html";
+
+        // SMTP Properties
+        Properties props = new Properties();
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", port);
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+
+        // Authenticator
+        Authenticator auth = new Authenticator() {
+            public PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(userName, password);
+            }
+        };
+
+        // Create Session
+        Session session = Session.getInstance(props, auth);
+
+        try {
+            // Create Email
+            MimeMessage msg = new MimeMessage(session);
+            msg.setFrom(new InternetAddress(userName));
+            msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
+            msg.setSubject(subject);
+            msg.setSentDate(new Date());
+
+            // Create message part
+            MimeBodyPart messageBodyPart = new MimeBodyPart();
+            messageBodyPart.setContent(reportMessage, "text/html");
+
+            // Create multipart
+            Multipart multipart = new MimeMultipart();
+            multipart.addBodyPart(messageBodyPart);
+
+            // Attach report
+            MimeBodyPart attachPart = new MimeBodyPart();
+            DataSource source = new FileDataSource(new File(attachFilePath));
+            attachPart.setDataHandler(new DataHandler(source));
+            attachPart.setFileName(reportFileName + ".html");
+            multipart.addBodyPart(attachPart);
+
+            // Set content
+            msg.setContent(multipart);
+
+            // Send email
+            Transport.send(msg);
+            System.out.println("✅ Report Email Sent Successfully");
+
+        } catch (MessagingException e) {
+            System.err.println("❌ Failed to send email: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+}
+	
+

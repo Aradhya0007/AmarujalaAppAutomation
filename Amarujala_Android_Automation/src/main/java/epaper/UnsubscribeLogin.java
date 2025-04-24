@@ -1,0 +1,255 @@
+package epaper;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+import org.testng.Assert;
+
+import basetest.Abstract;
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.android.nativekey.AndroidKey;
+import io.appium.java_client.android.nativekey.KeyEvent;
+import login.Popuplogin;
+
+public class UnsubscribeLogin extends Abstract{
+	AndroidDriver driver;
+	public UnsubscribeLogin(AndroidDriver driver) {
+		super(driver);
+		this.driver=driver;
+		// TODO Auto-generated constructor stub
+		PageFactory.initElements(driver, this);
+	}
+	
+	//  clicking epaper on epaper homepage
+		@FindBy(xpath = "//android.view.ViewGroup[@content-desc='Epaper']")
+		WebElement clickepaper;
+	
+	//checking pop is opening if the user is not login
+		@FindBy(xpath = "//android.widget.TextView[@text='लॉगइन या साइन अप']")
+		WebElement loginpopupepaper;
+			
+//  Header of epaper........    
+		
+		
+		// download button
+		@FindBy(xpath = "//*[@class='android.view.ViewGroup' and ./following-sibling::*[@class='android.widget.FrameLayout']]/*[6]/*[@class='com.horcrux.svg.SvgView']/*[@class='com.horcrux.svg.GroupView']/*[2]")
+		WebElement downloadepaper;
+
+		// crop button 
+		@FindBy(xpath = "//*[@class='android.view.ViewGroup' and ./following-sibling::*[@class='android.widget.FrameLayout']]/*[5]/*[@class='com.horcrux.svg.SvgView']/*[@class='com.horcrux.svg.GroupView']/*[@class='com.horcrux.svg.PathView']")
+		WebElement cropepaper;
+
+		// type of newspaper scroll down button
+		@FindBy(xpath = "(//*[@class='com.horcrux.svg.GroupView' and ./parent::*[@class='com.horcrux.svg.SvgView' and ./preceding-sibling::*[contains(@text, '')]]]/*[@class='com.horcrux.svg.PathView'])[1]")
+		WebElement typeofepaper;
+
+
+		// date change button
+		@FindBy(xpath = "(//*[@class='com.horcrux.svg.SvgView' and ./parent::*[starts-with(@content-desc, '')]]/*[@class='com.horcrux.svg.GroupView']/*[@class='com.horcrux.svg.PathView'])[3]")
+		WebElement dateepaper;
+
+
+		// back button
+		@FindBy(xpath = "//*[@class='com.horcrux.svg.SvgView' and ./parent::*[@class='android.view.ViewGroup' and ./following-sibling::*[@content-desc='Delhi']]]/*[@class='com.horcrux.svg.GroupView']/*[@class='com.horcrux.svg.PathView']")
+		WebElement backbtnepaper;
+
+		// share button
+		@FindBy(xpath = "//*[@class='android.view.ViewGroup' and ./following-sibling::*[@class='android.widget.FrameLayout']]/*[7]/*[@class='com.horcrux.svg.SvgView']/*[@class='com.horcrux.svg.GroupView']/*[@class='com.horcrux.svg.PathView']")
+		WebElement Shareepaper;
+
+		// location
+		@FindBy(xpath = "//*[@class='com.horcrux.svg.GroupView' and ./parent::*[@class='com.horcrux.svg.SvgView' and ./following-sibling::*[contains(@text, '')]]]/*[@class='com.horcrux.svg.GroupView']/*[3]")
+		WebElement locationpaper;
+
+		
+//Footer..........
+		//सभी पेज देखें
+		@FindBy(xpath = ("//android.widget.TextView[@text='सभी पेज देखें']"))
+		WebElement listofpagepaper;
+		
+		//forward btn
+		@FindBy(xpath = ("//android.widget.FrameLayout[@resource-id='android:id/content']/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup[2]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView/com.horcrux.svg.PathView"))
+		WebElement forwardbtnepaper;
+		
+		//backward btn
+		@FindBy(xpath = ("//android.widget.FrameLayout[@resource-id='android:id/content']/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup[3]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView/com.horcrux.svg.PathView"))
+		WebElement backwardbtnepaper;
+		
+		//current page number 
+		@FindBy(xpath = ("(//android.view.ViewGroup//android.widget.TextView)[3]"))
+		WebElement currentpagebtnepaper;
+		
+		//total page number
+		@FindBy(xpath = ("(//android.view.ViewGroup//android.widget.TextView)[4]"))
+		WebElement totalpagebtnepaper;
+
+ // download bottom sheet  on click .....
+		
+		//ऑफलाइन पढ़ने के लिए सब्सक्राइब करें
+		@FindBy(xpath = "//android.widget.TextView[@text='ऑफलाइन पढ़ने के लिए सब्सक्राइब करें']")
+		WebElement offlinereadmsgBottomsheet;
+		
+		//अभी सदस्यता लें msg 
+		
+		@FindBy(xpath = "//android.view.ViewGroup[@content-desc='अभी सदस्यता लें']")
+		WebElement SubscribebtnBottomsheet;
+		
+		//login tbn
+		
+		@FindBy(xpath = "//android.widget.TextView[@text='पहले से ही सब्सक्राइबर हैं? Login']")
+		WebElement loginbtnBottomsheet;
+		
+        //क्लिप सुविधा का उपयोग करने के लिए सब्सक्राइब करें
+	    @FindBy(xpath = "//android.widget.TextView[@text='क्लिप सुविधा का उपयोग करने के लिए सब्सक्राइब करें']")
+	    WebElement clipmsgBottomsheet;
+	    
+        //  seekbar on bottom sheet
+		@FindBy(xpath = "//android.widget.SeekBar[@content-desc='Bottom sheet handle']/android.view.ViewGroup")
+		WebElement seekbar;
+		
+		//bottom sheet msg after 3 action 
+		@FindBy(xpath = "//android.widget.TextView[@text='फ्री में पढ़ना जारी रखने के लिए यह वीडियो विज्ञापन देखें']")
+		WebElement unsubscribemsgbottomsheet;
+		
+//location.....
+		//name 
+		@FindBy(xpath = ("(//android.widget.SeekBar[@content-desc='Bottom Sheet'])[2]/android.view.ViewGroup//android.widget.TextView[not(@text='अपना शहर चुनें')]"))
+		List<WebElement> citynameloaction; 
+		
+		
+		
+		
+		public void epapercheck() throws InterruptedException {
+			clickepaper.click();
+			
+			//it is unlogin that conditon is checked that the popwindow should open 
+			assertDisplayed(loginpopupepaper, "login buttom sheet is not openning in epaper for not login user");
+			
+			
+			//login/signup but that user is not premium
+			Popuplogin loginepaper=new Popuplogin(driver);            loginepaper.finalpoplogin();
+			Thread.sleep(5000);
+			
+			
+			// Press the phone's back button
+			//driver.pressKey(new KeyEvent(AndroidKey.BACK));
+			
+			
+			
+			
+//combination one 
+			
+			//check the download and crop btn should show pop for no prmium user 
+			click(downloadepaper,"click on dowload epaper");
+			assertDisplayed(offlinereadmsgBottomsheet, "Bottom sheet open with msg in epaper when click on download");
+			
+			dragElementDown( seekbar);
+			
+			
+			//click on clip btn without subscribtion
+			click( cropepaper,"click on clip button");
+			assertDisplayed(clipmsgBottomsheet, "Bottom sheet open with msg in epaper when click on clip btn");
+			//driver.pressKey(new KeyEvent(AndroidKey.BACK));
+			
+			
+			
+			
+			
+			
+//combination  two
+			//view 3 paper view by forward and back ward for every state by one and date chnage if popup come for subscribtion click back and start again with new state 
+			
+			//starting page...........................
+			
+			int pagetotalcount = Integer.parseInt(totalpagebtnepaper.getText().trim());
+			Threeforwardaction(pagetotalcount);
+			driver.pressKey(new KeyEvent(AndroidKey.BACK));
+			clickepaper.click();
+			
+			
+			click(locationpaper,"click on the location btn");
+			
+			
+			
+			Set<String> clickedCities = new HashSet<>();
+			String lastCityName = "Vikas Nagar"; // Replace with your actual last city name
+			boolean isLastCityClicked = false;
+
+			while (!isLastCityClicked) {
+				List<WebElement> cityList=driver.findElements(By.xpath("(//android.widget.SeekBar[@content-desc='Bottom Sheet'])[2]/android.view.ViewGroup//android.widget.TextView[not(@text='अपना शहर चुनें')]")); 
+			   
+			    for (WebElement city : cityList) {
+			        String cityName = city.getText().trim();
+
+			        // Skip if empty or already clicked
+			        if (cityName.isEmpty() || clickedCities.contains(cityName)) {
+			            continue;
+			        }
+
+			        // Click the city
+			        city.click();
+			        System.out.println("✅ Clicked city: " + cityName);
+			        clickedCities.add(cityName);
+			        Thread.sleep(1000); // Wait after click
+			        WebElement pagecount=driver.findElement(By.xpath("//android.view.ViewGroup//android.widget.TextView)[4]"));
+			        
+			        int pagetotalcounts = Integer.parseInt(totalpagebtnepaper.getText().trim());
+			        Threeforwardaction(pagetotalcount);
+			        click(locationpaper,"click on the location btn");
+			        
+
+			        // Check if it's the last city, then break
+			        if (cityName.equalsIgnoreCase(lastCityName)) {
+			            isLastCityClicked = true;
+			            System.out.println("🎯 Last city clicked: " + cityName);
+			            break;
+			        }
+			        
+			 
+
+			        break; // Refresh the city list again
+			    }
+			    
+			    
+
+			    if (!isLastCityClicked) {
+			        // Scroll to load more if last city not yet clicked
+			        WebElement lastVisible = cityList.get(cityList.size() - 1);
+			        swipeUp();
+			       // scrollFromElementToBottom(lastVisible); 
+			        Thread.sleep(1000); 
+			    }else {
+			    	break;
+			    }
+			}
+
+				
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		public void Threeforwardaction(int totalcount) {
+			
+			for(int i=0;i<totalcount;i++) {
+				click(forwardbtnepaper,"moving forward epaper by one "+i+" time");
+				String currentActivity = driver.currentActivity();
+				System.out.println("Current Activity: " + currentActivity);
+				
+				if(i==3) {
+					assertDisplayed(unsubscribemsgbottomsheet, "Bottom sheet open after 3 paer view  ");
+				
+					break;
+				}
+			}
+		}
+}

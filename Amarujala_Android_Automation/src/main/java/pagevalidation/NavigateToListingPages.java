@@ -1,0 +1,55 @@
+package pagevalidation;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+
+import basetest.Abstract;
+import io.appium.java_client.android.AndroidDriver;
+
+public class NavigateToListingPages extends Abstract {
+	AndroidDriver driver;
+	public NavigateToListingPages(AndroidDriver driver) {
+		super(driver);
+		// TODO Auto-generated constructor stub
+		this.driver=driver;
+		 PageFactory.initElements(driver, this);
+	}
+	
+	//full navbar 
+	@FindBy(xpath="//android.widget.FrameLayout[@resource-id=\"android:id/content\"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup")
+	WebElement headerMenu;
+	
+	
+	public void  navigatefromheadernav() throws Exception {
+		 boolean isTabFound = false;
+
+
+	    for (int i = 0; i < 5; i++) {
+	        try {
+	            WebElement tab = headerMenu.findElement(By.xpath("//android.view.View[@content-desc='देश']/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup"));
+	            if (tab.isDisplayed()) {
+	                tab.click();
+	                isTabFound=true;
+	                System.out.println("✅ Tab clicked: " );
+	                break;
+	            }
+	        } catch (Exception e) {
+	            swipeInsideHeader(headerMenu);  // swipe inside header only
+	            Thread.sleep(1000);
+	        }
+	    }
+	    
+	    
+	    if(!isTabFound) {
+	    	System.out.println("Not found");
+	    	return;
+	    }
+	    ArticleStatus status=new ArticleStatus(driver);
+		status.validateArticlesUntilTodayEnds();
+	    
+	    }
+	
+	
+}

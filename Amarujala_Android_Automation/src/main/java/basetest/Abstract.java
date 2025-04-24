@@ -1,6 +1,7 @@
 package basetest;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -10,6 +11,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Pause;
 import org.openqa.selenium.interactions.PointerInput;
 import org.openqa.selenium.interactions.Sequence;
 import org.openqa.selenium.support.FindBy;
@@ -26,7 +28,7 @@ import io.appium.java_client.android.nativekey.KeyEvent;
 
 public class Abstract {
 	AndroidDriver driver;
-	JavascriptExecutor js ;
+	public JavascriptExecutor js ;
 	WebDriverWait wait;
 	
 	public Abstract(AndroidDriver driver) {
@@ -47,6 +49,9 @@ public class Abstract {
 	@FindBy(xpath="//android.widget.TextView[@text=\"मेन्यू\"]")
 	WebElement Menu;
 	
+	//header navbar 
+//	@FindBy(xpath="//android.widget.FrameLayout[@resource-id=\"android:id/content\"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup")
+//	WebElement headerMenu;
 	
 
 	public void menu() {
@@ -256,7 +261,44 @@ public class Abstract {
 	    driver.perform(Collections.singletonList(swipe));
 	}
 	
+// //swipe of header to left
+	public void swipeInsideHeader(WebElement headerMenu) {
+	    // Get location and size of the header menu element
+	    int startX = headerMenu.getLocation().getX() + (int) (headerMenu.getSize().getWidth() * 0.8);
+	    int endX = headerMenu.getLocation().getX() + (int) (headerMenu.getSize().getWidth() * 0.2);
+	    int centerY = headerMenu.getLocation().getY() + (headerMenu.getSize().getHeight() / 2);
 
+	    PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+	    Sequence swipe = new Sequence(finger, 1);
+
+	    swipe.addAction(finger.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), startX, centerY));
+	    swipe.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+	    swipe.addAction(finger.createPointerMove(Duration.ofMillis(500), PointerInput.Origin.viewport(), endX, centerY));
+	    swipe.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+
+	    driver.perform(Arrays.asList(swipe));
+	}
+	
+//swipe down by the help of element...
+	
+	public void dragElementDown( WebElement element) {
+	    PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+	    Sequence sequence = new Sequence(finger, 1);
+
+	   
+	    sequence.addAction(finger.createPointerMove(Duration.ofMillis(0), PointerInput.Origin.fromElement(element), 0, 0));
+
+	    sequence.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+
+	    sequence.addAction(new Pause(finger, Duration.ofMillis(300)));
+
+	    sequence.addAction(finger.createPointerMove(Duration.ofMillis(600), PointerInput.Origin.fromElement(element), 0, 400));
+	    sequence.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+
+	    driver.perform(Arrays.asList(sequence));
+	}
+	
+	
 
 
 //click senkey clear asseriton
@@ -304,5 +346,19 @@ public void assertDisplayed(WebElement element, String elementName) {
         throw e;
     }
 }
+//display
+public void CustomDisplay(WebElement element, String elementName) {
+    try {
+        if (element.isDisplayed()) {
+            ExtentLogger.logPass(elementName + " is displayed.");
+        } else {
+            ExtentLogger.logFail(elementName + " is not displayed.");
+        }
+    } catch (Exception e) {
+        ExtentLogger.logFail("Error while checking display of " + elementName + ": " + e.getMessage());
+        ExtentLogger.logException(e, driver);
+    }
+}
+
 }
 

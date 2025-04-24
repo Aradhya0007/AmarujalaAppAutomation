@@ -8,8 +8,10 @@ import org.testng.annotations.Test;
 import Signup.TypesOfSignup;
 import basetest.Basecode;
 import basetest.ExtentLogger;
+import epaper.Navigation_of_epaper;
 import login.TypesOfLogin;
 import pagevalidation.ArticleStatus;
+import pagevalidation.NavigateToListingPages;
 
 @Listeners(basetest.Listeners.class)
 public class AutomationAos extends Basecode {
@@ -59,9 +61,17 @@ public class AutomationAos extends Basecode {
 //	    
 //	    
 //	}
-	@Test
-	public void urlstatus() throws Exception {
-		ArticleStatus status=new ArticleStatus(driver);
-		status.validateArticlesUntilTodayEnds();
+	@Test  
+	public void Epaper() throws Exception { 
+		
+		Navigation_of_epaper navigate=new Navigation_of_epaper(driver);
+		navigate.navigate_epaper();
 	}
+	
+	
+//	@Test
+//	public void epaper() throws InterruptedException {
+//		Navigation_of_epaper Epaper=new Navigation_of_epaper(driver);
+//		Epaper.navigate_epaper();
+//	}
 }

@@ -62,7 +62,7 @@ public class NumberPassLogin extends Abstract {
 			public void loginwithNumberPassflow() throws InterruptedException {
 			    driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 
-			    // Blank fields
+			    // Blank fields 
 			    Thread.sleep(2000);
 			    click(SubmitLoginLogin, "Submit Login (Blank Fields)");
 			    assertDisplayed(InvalidEmailValidationMsgLogin, "Validation Message for Blank Email/Phone");

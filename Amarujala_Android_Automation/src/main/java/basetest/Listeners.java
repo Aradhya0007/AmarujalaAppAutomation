@@ -70,6 +70,20 @@ public class Listeners extends Basecode implements ITestListener {
 
     @Override
     public void onFinish(ITestContext context) {
-        extent.flush(); // Must flush to generate report
+        extent.flush();// Must flush to generate report
+       
+       
+            String toEmail = "aradhyajoshi583@gmail.com"; // 🔁 Update to actual recipient
+            String subject = "🔥 Test Automation Report";
+            String message = "<h3>Hi Team,</h3><p>Find the attached report.</p><br><b>Thanks,<br>QA Team</b>";
+            String fileName = "ExtentReport"; // No need for .html extension
+
+            try {
+				Email.sendReport(toEmail, subject, message, fileName);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        
     }
 }

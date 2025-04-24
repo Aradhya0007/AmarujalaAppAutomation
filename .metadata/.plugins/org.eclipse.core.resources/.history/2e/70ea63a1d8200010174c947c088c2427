@@ -1,0 +1,21 @@
+package epaper;
+
+import org.openqa.selenium.support.PageFactory;
+
+import basetest.Abstract;
+import io.appium.java_client.android.AndroidDriver;
+
+public class Subscribe_Login extends Abstract {
+	AndroidDriver driver;
+	public Subscribe_Login(AndroidDriver driver) {
+		super(driver);
+		// TODO Auto-generated constructor stub
+		this.driver=driver;
+		PageFactory.initElements(driver, this);
+	}
+	
+	public void SubscribeEpaerCheck() {
+		
+	}
+
+}

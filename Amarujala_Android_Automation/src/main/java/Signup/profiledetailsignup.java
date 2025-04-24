@@ -255,6 +255,6 @@ public class profiledetailsignup extends Abstract {
 		Thread.sleep(2000);
 		click(DeshIntrest, "Desh Interest");
 		click(GoAheadLocation, "Go Ahead Button Location");
-		
+		 
 	}
 }

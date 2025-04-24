@@ -1,0 +1,33 @@
+package epaper;
+
+import java.time.Duration;
+
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+
+import basetest.Abstract;
+import io.appium.java_client.android.AndroidDriver;
+
+public class Navigation_of_epaper extends Abstract {
+	AndroidDriver driver;
+public Navigation_of_epaper(AndroidDriver driver) {
+		super(driver);
+		// TODO Auto-generated constructor stub
+		this.driver=driver;
+		PageFactory.initElements(driver, this);
+	}
+
+		//  
+		@FindBy(xpath = "//android.widget.TextView[@text='ई-पेपर']")
+		WebElement epaperfooterclick;
+		
+		
+		
+		public void navigate_epaper() throws InterruptedException {
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+			epaperfooterclick.click();
+			Subscribe_Login Subscribe=new Subscribe_Login(driver);
+			Subscribe.TypeOfPaper();
+		}
+}

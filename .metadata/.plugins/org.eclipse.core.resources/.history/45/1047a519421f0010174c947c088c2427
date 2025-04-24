@@ -1,0 +1,133 @@
+package login;
+
+import java.time.Duration;
+
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+import org.testng.Assert;
+
+import basetest.Abstract;
+import io.appium.java_client.android.AndroidDriver;
+
+public class Emailpasslogin extends Abstract {
+	public AndroidDriver driver;
+	public Emailpasslogin(AndroidDriver driver) {
+		super(driver);
+		// TODO Auto-generated constructor stub
+		this.driver=driver;
+		PageFactory.initElements(driver, this);
+	}
+	//Locator......
+	
+	//enter email and number conatiner 
+		@FindBy(xpath="(//android.widget.EditText)[1]")
+		WebElement EmailLogin;
+		
+		//enter password
+		@FindBy(xpath="(//android.widget.EditText)[2]")
+		WebElement PasswordLogin;
+
+        //validation msg when invalid/blank email/num
+		@FindBy(xpath="//android.widget.TextView[@text=\"कृपया एक वैध ईमेल/फोन नंबर दर्ज करें\"]")
+		WebElement InvalidEmailValidationMsgLogin;
+		
+		//validation msg when invalid/blank Password
+		@FindBy(xpath="//android.widget.TextView[@text=\"कृपया पासवर्ड दर्ज करें\"]")
+		WebElement InvalidPasswordValidationMsfLogin;
+		
+		//watch the pass
+		@FindBy(xpath="//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView/com.horcrux.svg.GroupView/com.horcrux.svg.PathView[2]")
+		WebElement WatchPassLogin;
+		
+		//login kare
+		@FindBy(xpath="//android.view.ViewGroup[@content-desc=\"लॉगइन करें\"]")
+		WebElement SubmitLoginLogin;
+		
+		//when incorrect email or pass is filled msg popup
+		@FindBy(xpath="//android.widget.TextView[@text=\"Please enter a valid email & password. Or click on Forgot Password to reset the password.\"]")
+		WebElement IncorrectPopupMsgLogin;
+		
+		//ok btn
+		@FindBy(xpath="//android.widget.TextView[@text=\"OK\"]")
+		WebElement OKbtnOfPopupLogin;
+		
+		//Blocked validation msg 
+		@FindBy(xpath="//android.widget.TextView[@text=\"Account blocked, Please try after few minutes\"]")
+		WebElement BlockedValidationMsgLogin;
+		
+		
+		
+		public void loginwithpasswordflow() throws InterruptedException {
+		    driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+
+		    // blank filled submit
+		    Thread.sleep(2000);
+		    click(SubmitLoginLogin, "Submit Login Button (Blank Fields)");
+		    assertDisplayed(InvalidEmailValidationMsgLogin, "Invalid Email Validation Message");
+		    assertDisplayed(InvalidPasswordValidationMsfLogin, "Invalid Password Validation Message");
+
+		    // invalid email Valid pass
+		    sendKeys(EmailLogin, "testsjj.com", "Email Field - Invalid Email");
+		    sendKeys(PasswordLogin, "Test22@", "Password Field - Valid Password");
+		    click(WatchPassLogin, "Watch Password Icon");
+		    click(SubmitLoginLogin, "Submit Login Button (Invalid Email)");
+		    assertDisplayed(InvalidEmailValidationMsgLogin, "Invalid Email Validation Message");
+		    clear(EmailLogin, "Email Field");
+		    clear(PasswordLogin, "Password Field");
+
+		    // invalid pass valid email
+		    sendKeys(EmailLogin, "testing12@gmail.com", "Email Field - Valid Email");
+		    sendKeys(PasswordLogin, "Test", "Password Field - Invalid Password");
+		    click(SubmitLoginLogin, "Submit Login Button (Invalid Password)");
+		    assertDisplayed(InvalidPasswordValidationMsfLogin, "Invalid Password Validation Message");
+		    clear(EmailLogin, "Email Field");
+		    clear(PasswordLogin, "Password Field");
+
+		    // wrong email and pass
+		    sendKeys(EmailLogin, "testing12@gmail.com", "Email Field - Wrong Email");
+		    sendKeys(PasswordLogin, "Test221@", "Password Field - Wrong Password");
+		    click(SubmitLoginLogin, "Submit Login Button (Wrong Email & Password)");
+		    assertDisplayed(IncorrectPopupMsgLogin, "Incorrect Popup Message");
+		    click(OKbtnOfPopupLogin, "OK Button in Popup");
+		    clear(EmailLogin, "Email Field");
+		    clear(PasswordLogin, "Password Field");
+
+		    // Wrong email and correct pass
+		    sendKeys(EmailLogin, "amresh.pandhjhey@auw.co.in", "Email Field - Wrong Email");
+		    sendKeys(PasswordLogin, "Amresh@123", "Password Field - Correct Password");
+		    click(SubmitLoginLogin, "Submit Login Button (Wrong Email)");
+		    assertDisplayed(IncorrectPopupMsgLogin, "Incorrect Popup Message");
+		    click(OKbtnOfPopupLogin, "OK Button in Popup");
+		    clear(EmailLogin, "Email Field");
+		    clear(PasswordLogin, "Password Field");
+
+		    // correct email wrong pass
+		    sendKeys(EmailLogin, "amresh.pandey@auw.co.in", "Email Field - Correct Email");
+		    sendKeys(PasswordLogin, "Amresh@12", "Password Field - Wrong Password");
+		    click(SubmitLoginLogin, "Submit Login Button (Wrong Password)");
+		    assertDisplayed(IncorrectPopupMsgLogin, "Incorrect Popup Message");
+		    click(OKbtnOfPopupLogin, "OK Button in Popup");
+
+		    // blocked case
+		    click(SubmitLoginLogin, "Submit Login Button (Blocked Case Attempt 1)");
+		    assertDisplayed(IncorrectPopupMsgLogin, "Incorrect Popup Message");
+		    click(OKbtnOfPopupLogin, "OK Button in Popup");
+
+		    click(SubmitLoginLogin, "Submit Login Button (Blocked Case Attempt 2)");
+		    assertDisplayed(IncorrectPopupMsgLogin, "Incorrect Popup Message");
+		    click(OKbtnOfPopupLogin, "OK Button in Popup");
+
+		    click(SubmitLoginLogin, "Submit Login Button (Blocked Case Final)");
+		    assertDisplayed(BlockedValidationMsgLogin, "Blocked Account Validation Message");
+		    click(OKbtnOfPopupLogin, "OK Button in Popup");
+
+		    // correct flow 
+		    sendKeys(EmailLogin, "Sudhanshu.sharma@auw.co.in", "Email Field - Correct Email");
+		    sendKeys(PasswordLogin, "Test@123", "Password Field - Correct Password");
+		    click(SubmitLoginLogin, "Submit Login Button (Successful Login)");
+		}
+
+		
+
+}
