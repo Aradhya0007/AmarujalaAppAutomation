@@ -28,8 +28,8 @@ public class Email {
         // Configuration
         String host = "smtp.gmail.com";
         String port = "587";
-        final String userName = "aradhyajoshi00007@gmail.com";  // your email
-        final String password = "peuxvfejmueaszkh";        // App password (not your regular password)
+        final String userName = "sender";  // your email
+        final String password = "change";        // App password (not your regular password)
 
         // Report path (make sure this file exists after test run)
         String attachFilePath =System.getProperty("user.dir") + "/reports/index.html";
